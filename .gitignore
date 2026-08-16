@@ -6,3 +6,4 @@ obj/
 
 # scraper / server run logs
 *.log
+dist/

@@ -2,6 +2,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using OctoBis.Scraper;
 
+/// <summary>Sources kept per item in the published data. Sorted most-accessible first.</summary>
+const int MaxSourcesPerItem = 6;
+
 // A full crawl runs for hours and is normally watched through a redirected log. .NET buffers stdout
 // when it is not a console, which makes progress invisible until the process ends, so flush eagerly.
 Console.SetOut(new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true });
@@ -361,6 +364,10 @@ await WriteJsonAsync(Path.Combine(dataDir, "sources.json"), new
             kv => kv.Value
                 .OrderBy(s => s.Phase)
                 .ThenByDescending(s => s.Percent ?? 0)
+                // A world-drop item can list hundreds of sources and the site only ever shows the
+                // most accessible one. Keeping a handful cuts this file from roughly 6MB to under
+                // 1MB, which matters because the whole dataset is downloaded on first load.
+                .Take(MaxSourcesPerItem)
                 .Select(s => new
                 {
                     kind = s.Kind.ToString().ToLowerInvariant(),
