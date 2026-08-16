@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OctoBiS — Best in Slot for OctoWoW</title>
+  <meta name="description" content="Phase-by-phase best-in-slot gear planner for OctoWoW: build a character, pick a phase, and see the ranked options for every slot and where they drop.">
+  <link rel="stylesheet" href="./site/css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/"><span class="brand-mark">OCTO</span><span class="brand-mark accent">BIS</span></a>
+
+    <div class="topbar-select" id="character-select">
+      <span class="topbar-label">Character</span>
+      <button class="topbar-button" id="character-button" type="button" aria-haspopup="true" aria-expanded="false">
+        <span id="character-current">No character</span>
+        <span class="chevron" aria-hidden="true">▾</span>
+      </button>
+      <div class="dropdown" id="character-menu" hidden></div>
+    </div>
+
+    <div class="topbar-select" id="phase-select">
+      <span class="topbar-label">Database</span>
+      <button class="topbar-button" id="phase-button" type="button" aria-haspopup="true" aria-expanded="false">
+        <span id="phase-current">Launch</span>
+        <span class="chevron" aria-hidden="true">▾</span>
+      </button>
+      <div class="dropdown" id="phase-menu" hidden></div>
+    </div>
+
+    <div class="mode-toggle" id="mode-toggle" role="group" aria-label="Loadout">
+      <button class="mode-button is-active" type="button" data-mode="pve">PvE</button>
+      <button class="mode-button" type="button" data-mode="pvp">PvP</button>
+    </div>
+
+    <nav class="topbar-nav">
+      <button class="nav-link is-active" type="button" data-view="planner">Planner</button>
+      <button class="nav-link" type="button" data-view="guide">Guide</button>
+      <button class="nav-link" type="button" data-view="talents">Talents</button>
+      <button class="nav-link" type="button" data-view="bis">BiS List</button>
+      <button class="nav-link" type="button" data-view="obtain">Obtain Checklist</button>
+      <a class="nav-link" href="https://octowow.st/db/" target="_blank" rel="noopener noreferrer">Database ↗</a>
+    </nav>
+  </header>
+
+  <main id="view" class="view" aria-live="polite">
+    <p class="loading">Loading item data…</p>
+  </main>
+
+  <footer class="footer">
+    <p>
+      Loot, drop rates and encounters from the Atlas-CFM addon; item stats from the
+      <a href="https://octowow.st/db/" target="_blank" rel="noopener noreferrer">OctoWoW database</a>;
+      phase schedule from the <a href="https://octowow.st/roadmap" target="_blank" rel="noopener noreferrer">roadmap</a>.
+      Rankings are computed from per-spec stat weights — read the caveats in the README before trusting them blindly.
+    </p>
+    <p class="muted" id="data-stamp"></p>
+  </footer>
+
+  <!-- Character creation -->
+  <div class="modal-backdrop" id="character-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="character-modal-title">
+      <header class="modal-header">
+        <div>
+          <h2 id="character-modal-title">Create a Character</h2>
+          <p class="modal-sub">Choose name, class/spec, and race. You can save up to 8.</p>
+        </div>
+        <button class="icon-button" type="button" data-close-modal aria-label="Close">✕</button>
+      </header>
+
+      <div class="modal-body">
+        <label class="field-label" for="new-name">Character name</label>
+        <div class="name-row">
+          <input class="text-input" id="new-name" type="text" placeholder="Enter name" maxlength="24" autocomplete="off">
+          <div class="gender-toggle" role="group" aria-label="Gender">
+            <button class="gender-button is-active" type="button" data-gender="male" aria-label="Male">♂</button>
+            <button class="gender-button" type="button" data-gender="female" aria-label="Female">♀</button>
+          </div>
+        </div>
+
+        <h3 class="field-label">Class</h3>
+        <div class="pick-grid" id="class-grid"></div>
+
+        <h3 class="field-label">Specialization</h3>
+        <div class="pick-grid" id="spec-grid"><p class="hint">Select a class first.</p></div>
+
+        <h3 class="field-label">Race</h3>
+        <div class="pick-grid race-grid" id="race-grid"></div>
+
+        <p class="form-error" id="character-error" hidden></p>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="button" type="button" data-close-modal>Cancel</button>
+        <button class="button button-primary" id="create-character" type="button" disabled>Create</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Slot item picker -->
+  <div class="modal-backdrop" id="picker-modal" hidden>
+    <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+      <header class="modal-header">
+        <h2 id="picker-title">Select Slot</h2>
+        <button class="icon-button" type="button" data-close-modal aria-label="Close">✕</button>
+      </header>
+
+      <div class="picker-controls">
+        <input class="text-input" id="picker-search" type="search" placeholder="Search…" autocomplete="off">
+        <select class="select-input" id="picker-source"><option value="">All sources</option></select>
+        <select class="select-input" id="picker-quality">
+          <option value="0">All qualities</option>
+          <option value="3">Rare and better</option>
+          <option value="4">Epic and better</option>
+        </select>
+        <label class="checkbox"><input type="checkbox" id="picker-usable" checked> Usable only</label>
+      </div>
+
+      <div class="picker-body">
+        <table class="picker-table">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col" class="col-score">Score</th>
+              <th scope="col">Source</th>
+            </tr>
+          </thead>
+          <tbody id="picker-rows"></tbody>
+        </table>
+        <p class="empty" id="picker-empty" hidden>Nothing matches.</p>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="button" type="button" id="picker-clear">Unequip slot</button>
+        <button class="button" type="button" data-close-modal>Close</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Enchant picker -->
+  <div class="modal-backdrop" id="enchant-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="enchant-title">
+      <header class="modal-header">
+        <div>
+          <h2 id="enchant-title">Choose an enchant</h2>
+          <p class="modal-sub">Enchants are not phase-gated — everything available is offered in every phase.</p>
+        </div>
+        <button class="icon-button" type="button" data-close-modal aria-label="Close">✕</button>
+      </header>
+
+      <div class="picker-controls">
+        <input class="text-input" id="enchant-search" type="search" placeholder="Search enchants…" autocomplete="off">
+      </div>
+
+      <div class="picker-body">
+        <ul class="enchant-list" id="enchant-rows"></ul>
+        <p class="empty" id="enchant-empty" hidden>Nothing matches.</p>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="button" type="button" id="enchant-clear">Remove enchant</button>
+        <button class="button" type="button" data-close-modal>Close</button>
+      </footer>
+    </div>
+  </div>
+
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+
+  <script type="module" src="./site/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+{
+  "_comment": [
+    "Content phasing for OctoWoW, taken from the official roadmap at https://octowow.st/roadmap.",
+    "The roadmap states dates are subject to change - update them here, never in markup.",
+    "",
+    "Each phase lists the content it unlocks. The scraper resolves 'zones' entries to zone ids",
+    "using the merged zone-name map, then seeds its crawl with every NPC known to spawn in those",
+    "zones. Most bosses need no naming here - the crawler finds them by following an item's page",
+    "back to everything that drops it, which is what makes Turtle's custom instances workable",
+    "without published boss lists.",
+    "",
+    "'npcs' covers the cases that discovery cannot reach:",
+    "  - roaming world bosses, which belong to no instance zone;",
+    "  - summoned or scripted encounters that have no spawn entry AND whose loot is exclusive to",
+    "    them, so no other item page ever mentions them. Nefarian is the type case: he is not in",
+    "    the spawn table, and only he drops his tier pieces, so nothing else can lead to him.",
+    "Names are resolved through the database search, and anything that fails to resolve is listed",
+    "in data/meta.json under unresolved.npcNames rather than failing silently."
+  ],
+
+  "roadmapUrl": "https://octowow.st/roadmap",
+  "databaseUrl": "https://octowow.st/db/",
+
+  "_atlasComment": [
+    "Loot now comes primarily from the Atlas-CFM addon's database, which is curated for this",
+    "server family: it carries drop rates, names and orders every encounter, and keeps each",
+    "instance separate - including the custom ones the website's zone data cannot tell apart.",
+    "",
+    "'atlasInstances' names the instances a phase unlocks, using Atlas's own keys (run the scraper",
+    "with --atlas-report to list them). Anything not named under a phase is treated as available at",
+    "launch, so only gated content needs listing here."
+  ],
+
+  "phases": [
+    {
+      "id": 0,
+      "key": "launch",
+      "name": "Launch",
+      "date": null,
+      "status": "live",
+      "blurb": "The unphased 1.18.1 restoration. Everything available before the phase rollout begins: Molten Core, Onyxia, the Turtle custom dungeons and raids, world bosses, reputations and crafting.",
+      "zones": [
+        "Molten Core",
+        "Onyxia's Lair",
+        "Karazhan Crypt",
+        "The Black Morass",
+        "Stormwind Vault",
+        "Hateforge Quarry",
+        "Hateforge Excavation",
+        "Gilneas City",
+        "Crescent Grove",
+        "Blackrock Spire",
+        "Blackrock Depths",
+        "Stratholme",
+        "Scholomance",
+        "Dire Maul",
+        "Scarlet Monastery",
+        "Sunken Temple",
+        "Maraudon",
+        "Uldaman",
+        "Zul'Farrak",
+        "Blackfathom Deeps",
+        "Razorfen Downs"
+      ],
+      "_lowerKarazhanHallsComment": [
+        "Lower Karazhan Halls is Launch content (10-man, T1) but cannot be separated here. The",
+        "database has two Karazhan zones: 'Karazhan' (2562) holds no spawns at all, and 'Tower of",
+        "Karazhan' (3457) holds all 106 of them - the lower halls and the Phase 7 tower share it.",
+        "Rather than guess a split, the zone stays with Phase 7 where the roadmap puts Karazhan, so",
+        "some gear reachable today is currently shown one phase late. Fix this by adding the right",
+        "zone id to zoneIdOverrides once the two are distinguishable."
+      ],
+      "_zonesComment": [
+        "Open-world zones are deliberately absent. Seeding a zone crawls every NPC that spawns in",
+        "it, and a zone like Winterspring or Felwood is thousands of pages of trash that drops",
+        "nothing a level 60 would slot. Named world bosses are listed under 'npcs' instead, and any",
+        "world-drop epic that a tracked boss also drops is still picked up through the item pages."
+      ],
+      "npcs": [
+        "Azuregos",
+        "Lord Kazzak",
+        "Concavius",
+        "Ostarius of Uldum",
+        "Nerubian Overseer",
+        "Dark Reaver of Karazhan",
+        "Ysondre",
+        "Lethon",
+        "Emeriss",
+        "Taerar",
+        "Ragnaros",
+        "Majordomo Executus",
+        "Onyxia",
+        "Lord Valthalak",
+        "Prince Thunderaan"
+      ]
+    },
+    {
+      "id": 1,
+      "key": "p1",
+      "name": "Phase 1",
+      "date": "2026-10-01",
+      "status": "upcoming",
+      "blurb": "An ancient magic is felt in the heart of the Stranglethorn Vale as the lost city of Zul'Gurub stirs to life.",
+      "headline": "Zul'Gurub",
+      "atlasInstances": ["ZulGurub"],
+      "zones": ["Zul'Gurub"],
+      "npcs": ["Hakkar", "Jin'do the Hexxer", "Bloodlord Mandokir", "Gahz'ranka", "Gri'lek", "Hazza'rah", "Renataki", "Wushoolay"]
+    },
+    {
+      "id": 2,
+      "key": "p2",
+      "name": "Phase 2",
+      "date": "2026-11-05",
+      "status": "upcoming",
+      "blurb": "Nefarian's experiments spill from the depths of Blackrock Mountain. Storm Blackwing Lair and put an end to the corrupted broods of the black dragonflight.",
+      "headline": "Blackwing Lair",
+      "atlasInstances": ["BlackwingLair"],
+      "zones": ["Blackwing Lair"],
+      "npcs": ["Nefarian", "Razorgore the Untamed", "Vaelastrasz the Corrupt", "Chromaggus", "Broodlord Lashlayer"]
+    },
+    {
+      "id": 3,
+      "key": "p3",
+      "name": "Phase 3",
+      "date": "2027-01-28",
+      "status": "upcoming",
+      "blurb": "The Nightmare bleeds into the waking world. Journey into the Emerald Sanctum and confront the corruption festering at the roots of the Emerald Dream.",
+      "headline": "Emerald Sanctum",
+      "atlasInstances": ["EmeraldSanctum"],
+      "zones": ["Emerald Sanctum", "The Emerald Gateway"],
+      "npcs": []
+    },
+    {
+      "id": 4,
+      "key": "p4",
+      "name": "Phase 4",
+      "date": "2027-03-18",
+      "status": "upcoming",
+      "blurb": "Unite with the realm to complete the war effort and cleanse the ancient kingdom of Ahn'Qiraj.",
+      "headline": "Ahn'Qiraj",
+      "atlasInstances": ["TheTempleofAhnQiraj", "TheRuinsofAhnQiraj", "Kurinnaxx"],
+      "zones": ["Temple of Ahn'Qiraj", "Ruins of Ahn'Qiraj", "Ahn'Qiraj"],
+      "npcs": ["C'Thun", "Ouro", "Viscidus", "Emperor Vek'lor", "Emperor Vek'nilash", "Princess Huhuran", "The Prophet Skeram", "Battleguard Sartura", "Fankriss the Unyielding", "Lord Kri", "Princess Yauj", "Vem", "Kurinnaxx", "General Rajaxx", "Moam", "Buru the Gorger", "Ayamiss the Hunter", "Ossirian the Unscarred"]
+    },
+    {
+      "id": 5,
+      "key": "p5",
+      "name": "Phase 5",
+      "date": "2027-04-29",
+      "status": "upcoming",
+      "blurb": "Enter the maw of the Timbermaw Hold and discover the darkness within.",
+      "headline": "Timbermaw Hold",
+      "atlasInstances": ["TimbermawHold"],
+      "zones": ["Timbermaw Hold"],
+      "npcs": []
+    },
+    {
+      "id": 6,
+      "key": "p6",
+      "name": "Phase 6",
+      "date": "2027-06-24",
+      "status": "upcoming",
+      "blurb": "Journey back to the Eastern Kingdoms to purge the necropolis of Naxxramas.",
+      "headline": "Naxxramas",
+      "atlasInstances": ["Naxxramas"],
+      "zones": ["Naxxramas"],
+      "npcs": ["Kel'Thuzad", "Sapphiron", "Loatheb", "Thaddius", "Gluth", "Grobbulus", "Patchwerk", "Maexxna", "Grand Widow Faerlina", "Anub'Rekhan", "Instructor Razuvious", "Gothik the Harvester", "Noth the Plaguebringer", "Heigan the Unclean", "Highlord Mograine", "Thane Korth'azz", "Lady Blaumeux", "Sir Zeliek"]
+    },
+    {
+      "id": 7,
+      "key": "p7",
+      "name": "Phase 7",
+      "date": "2027-09-16",
+      "status": "upcoming",
+      "blurb": "The Tower of Karazhan is finally open. Are you prepared for what you'll find inside?",
+      "headline": "Karazhan",
+      "atlasInstances": ["TowerofKarazhan"],
+      "zones": ["Tower of Karazhan"],
+      "npcs": []
+    }
+  ],
+
+  "_zoneIdComment": [
+    "Zone ids that appear in the data with no name are reported in data/meta.json under",
+    "unresolved.unnamedZoneIds. Add them here as id -> canonical name.",
+    "",
+    "The 200-800 range is instance MAP ids: the database reports these instead of an area id for",
+    "some encounters. Naming them here does double duty, since a name that matches a phase's zone",
+    "list also gates that content correctly."
+  ],
+  "zoneIdOverrides": {
+    "229": "Blackrock Spire",
+    "269": "The Black Morass",
+    "289": "Scholomance",
+    "309": "Zul'Gurub",
+    "531": "Temple of Ahn'Qiraj",
+    "533": "Naxxramas",
+    "_karazhanNote": "532 and 814 were once guessed as Karazhan zones here. Atlas contradicted that - the bosses concerned belong to Tower of Karazhan - and a wrong label silently pulled Phase 7 loot into launch. Instance naming now comes from Atlas; leave these unmapped.",
+    "1977": "Zul'Gurub",
+    "3456": "Naxxramas",
+    "3457": "Tower of Karazhan",
+    "5077": "Crescent Grove",
+    "5086": "Karazhan Crypt",
+    "5087": "Stormwind Vault",
+    "5097": "Emerald Sanctum",
+    "5098": "Hateforge Quarry",
+    "5101": "Hateforge Excavation",
+    "5103": "Hateforge Quarry",
+    "5180": "Gilneas City",
+    "5204": "The Black Morass",
+    "5208": "Gilneas City",
+    "5221": "The Emerald Gateway"
+  },
+
+  "_factionPhaseComment": [
+    "Reputation rewards are only available once the faction is. Zandalar Tribe rep comes from",
+    "Zul'Gurub and Brood of Nozdormu from Ahn'Qiraj, so their rewards are not launch gear however",
+    "much the vendor looks like an ordinary one. Factions not listed are treated as launch, which is",
+    "right for the world reputations."
+  ],
+  "factionPhases": {
+    "Zandalar Tribe": 1,
+    "Brood Of Nozdormu": 4,
+    "Cenarion Circle": 4,
+    "Wardens of Time": 4
+  },
+
+  "_atlasSetPhaseComment": [
+    "Fallback phase for Sets.lua entries, matched by name prefix (longest wins).",
+    "",
+    "This only applies when an item has no source of its own. A tier piece that nothing in the crawl",
+    "drops still plainly belongs to its raid, and saying so is far better than the alternative: an",
+    "item with no phase at all used to fall back to launch, which put Naxxramas and Ahn'Qiraj gear",
+    "into the launch planner.",
+    "",
+    "Sets that span phases - artifacts, legendaries, world blues, crafted sets - are deliberately",
+    "absent. Items in those stay unknown and are excluded from phase-gated views rather than guessed."
+  ],
+  "atlasSetPhases": {
+    "T0": 0,
+    "T1VP": 0,
+    "T1": 0,
+    "T2": 2,
+    "T35": 4,
+    "T3": 6,
+    "ZG": 1,
+    "AQ20": 4,
+    "AQ40": 4
+  },
+
+  "_questItemComment": [
+    "Class quest rewards. These are unreachable by crawling: nothing drops them, no vendor sells",
+    "them, and the addon records the quests as prose rather than item ids. They are named here and",
+    "resolved through the database search, the same way scripted bosses are.",
+    "",
+    "Keep this to items worth planning around - the level 60 class weapons and the well-known quest",
+    "chains. Anything a boss actually drops is found without help."
+  ],
+  "questItems": [
+    "Benediction", "Anathema",
+    "Rhok'delar, Longbow of the Ancient Keepers", "Lok'delar, Stave of the Ancient Keepers",
+    "Quel'Serrar", "Verigan's Fist", "Corrupted Ashbringer",
+    "Thunderfury, Blessed Blade of the Windseeker", "Sulfuras, Hand of Ragnaros",
+    "The Eye of Divinity", "The Eye of Shadow",
+    "Hand of Edward the Odd", "Nightfall", "Azuresong Mageblade",
+    "Lok'amir il Romathis", "Fang of the Mystics", "Ironfoe",
+    "Sceptre of Celebras", "Ace of Beasts", "Draconic for Dummies"
+  ],
+
+  "_craftingComment": [
+    "Crafted gear is not discovered by crawling NPCs, so relevant recipes are named here and",
+    "resolved to item ids via database search. Keep this list to gear that is genuinely BiS-",
+    "contending; it is an editorial list, not an exhaustive one."
+  ],
+  "craftedItems": {
+    "launch": [
+      "Lionheart Helm", "Titanic Leggings", "Invulnerable Mail", "Hammer of the Titans",
+      "Arcanite Reaper", "Bloodvine Vest", "Bloodvine Leggings", "Bloodvine Boots",
+      "Devilsaur Gauntlets", "Devilsaur Leggings", "Corehound Boots", "Chromatic Cloak",
+      "Onyxia Scale Cloak", "Truefaith Vestments", "Robe of the Archmage", "Mooncloth Robe",
+      "Belt of the Archmage", "Gloves of Spell Mastery", "Flarecore Robe", "Flarecore Mantle",
+      "Girdle of the Dawn", "Fiery Plate Gauntlets", "Dark Iron Plate", "Dark Iron Gauntlets",
+      "Dark Iron Helm", "Dark Iron Leggings", "Dark Iron Bracers", "Dark Iron Boots",
+      "Wildthorn Mail", "Living Leggings", "Living Shoulders",
+      "Volcanic Breastplate", "Ironvine Belt", "Ironvine Breastplate", "Ironvine Gloves"
+    ],
+    "p1": ["Bloodsoul Breastplate", "Bloodsoul Shoulders", "Bloodsoul Gauntlets", "Primal Batskin Jerkin", "Primal Batskin Gloves", "Primal Batskin Bracers"],
+    "p2": ["Corehound Belt", "Hide of the Wild", "Gloves of the Greatfather"],
+    "p4": ["Bloodvine Goggles", "Living Leggings"],
+    "p6": ["Frostsaber Boots", "Icy Scale Breastplate"]
+  }
+}

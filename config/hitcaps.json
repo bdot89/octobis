@@ -1,0 +1,101 @@
+{
+  "_comment": [
+    "Hit requirements, and the talents that contribute towards them.",
+    "",
+    "In vanilla a level 60 attacking a higher-level target misses more, so the hit needed depends",
+    "entirely on what you are fighting. These are the standard 1.12 numbers for a level 60 with",
+    "300 weapon skill.",
+    "",
+    "The talent list is taken from OctoWoW's own talent calculator rather than assumed from vanilla,",
+    "because several of these do not exist in vanilla at all - Paladin Precision, Priest Piercing",
+    "Light, Shaman Elemental Devastation and Druid Genesis are all server additions. Re-run the",
+    "scraper with --talents and re-read data/talents.json if the trees are rebalanced."
+  ],
+
+  "_weaponSkillComment": [
+    "Weapon skill only affects melee, and it matters far more than it looks. Vanilla applies a",
+    "steeper miss penalty once the target's defense exceeds your weapon skill by more than 10, so",
+    "a level 63 boss (315 defense) punishes 300 skill badly - and the first five points, which take",
+    "you to 305 and back under that threshold, are worth 3% hit on their own. Points past 305 give",
+    "roughly 0.14% each.",
+    "",
+    "OctoWoW grants +5 per weapon type through the Fray Island quest chain: start Iron Determination",
+    "at level 55+, then Sakgoth offers a quest for each weapon you can use. That is why 305 is an",
+    "option here rather than an assumption.",
+    "",
+    "meleeCapBySkill is keyed by weapon skill. Values in between are interpolated, and anything above",
+    "the highest key falls off at perPointAbove305."
+  ],
+
+  "weaponSkill": {
+    "base": 300,
+    "questBonus": 5,
+    "max": 305,
+    "perPointAbove305": 0.14,
+    "questName": "Iron Determination → Sakgoth (Fray Island, level 55+)",
+    "note": "The quest chain grants +5 for one weapon type at a time, so this applies to whichever weapon you have trained."
+  },
+
+  "targets": [
+    {
+      "id": "pvp",
+      "name": "Players (PvP)",
+      "level": 60,
+      "blurb": "Other level 60 players. The easiest cap to reach, and the one that matters in battlegrounds and world PvP.",
+      "meleeCapBySkill": { "300": 5, "305": 5 },
+      "spellCap": 4,
+      "weaponSkillNote": "Against an equal-level target you are already at the floor, so weapon skill buys nothing here."
+    },
+    {
+      "id": "trash",
+      "name": "Mobs (level 60-62)",
+      "level": 62,
+      "blurb": "Ordinary dungeon and raid trash. Worth capping for if you spend a lot of time clearing.",
+      "meleeCapBySkill": { "300": 6, "305": 5.5 },
+      "spellCap": 6
+    },
+    {
+      "id": "boss",
+      "name": "Bosses (level 63)",
+      "level": 63,
+      "blurb": "Raid bosses are three levels above you, which is why the raiding hit cap is so much higher.",
+      "meleeCapBySkill": { "300": 9, "305": 6 },
+      "spellCap": 16,
+      "spellNote": "A level 63 target has 17% spell miss, but 1% of that cannot be removed by hit at all - 16% is the real cap.",
+      "dualWieldWhiteCap": 28,
+      "dualWieldNote": "White swings while dual wielding carry a further 19% penalty, so the 28% needed is not reachable from gear. Cap special attacks first and ignore the rest.",
+      "weaponSkillNote": "The five points from the weapon skill quest are worth 3% hit here - more than any single piece of gear."
+    }
+  ],
+
+  "_talentComment": [
+    "type: melee, spell, or both.",
+    "schools: when present, the talent only helps a spec whose school is in this list. A Shadow",
+    "priest gets Shadow Focus; a Holy one does not.",
+    "perRank: hit percentage granted by each point."
+  ],
+
+  "talents": {
+    "Precision": [
+      { "class": "rogue", "type": "melee", "perRank": 1 },
+      { "class": "paladin", "type": "both", "perRank": 1 }
+    ],
+    "Surefooted": [{ "class": "hunter", "type": "melee", "perRank": 1 }],
+    "Genesis": [{ "class": "druid", "type": "both", "perRank": 1 }],
+    "Elemental Devastation": [{ "class": "shaman", "type": "both", "perRank": 1 }],
+    "Shadow Focus": [{ "class": "priest", "type": "spell", "perRank": 2, "schools": ["shadow"] }],
+    "Piercing Light": [{ "class": "priest", "type": "spell", "perRank": 2, "schools": ["holy"] }],
+    "Arcane Focus": [{ "class": "mage", "type": "spell", "perRank": 2, "schools": ["arcane"] }],
+    "Elemental Precision": [{ "class": "mage", "type": "spell", "perRank": 2, "schools": ["fire", "frost"] }],
+    "Suppression": [{ "class": "warlock", "type": "spell", "perRank": 2, "schools": ["shadow"] }]
+  },
+
+  "_excludedComment": [
+    "Deliberately not counted, because they do not move the cap you actually gear for:",
+    "  Dual Wield Specialization (warrior) - off-hand white hits only, and white dual-wield hit is",
+    "    unreachable anyway.",
+    "  Bestial Precision (hunter), Demonic Precision (warlock) - pet hit, not yours.",
+    "  Improved Hand of Reckoning (paladin), Wand Specialization - single-ability hit.",
+    "  Blinding Haze (rogue) - reduces the target's hit, not yours."
+  ]
+}

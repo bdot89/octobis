@@ -1,0 +1,328 @@
+{
+  "_comment": [
+    "Class, spec and stat-weight definitions. This is the file to edit when a ranking looks wrong",
+    "for reasons of valuation; edit config/overrides.json instead when a single item is wrong for",
+    "reasons the maths cannot see (set bonuses, procs, weapon-speed breakpoints).",
+    "",
+    "Weights are expressed in attack-power-equivalent units for physical specs and in spell-power-",
+    "equivalent units for casters and healers, i.e. the primary throughput stat always has weight",
+    "1.0 and everything else is relative to it. Absolute scale does not matter, only ratios.",
+    "",
+    "'school' makes school-specific gear score correctly: the engine computes effective spell power",
+    "as spellPower + spellDmg<school>, so '+30 Fire Damage' counts fully for a Fire mage and not at",
+    "all for a Frost one, without double-counting generic '+30 Spell Damage'.",
+    "",
+    "A cap entry means value above 'cap' is scored at 'postCapWeight' instead of the full weight.",
+    "This is applied per item, which is an approximation - see README."
+  ],
+
+  "statKeys": [
+    "str", "agi", "sta", "int", "spi", "armor",
+    "ap", "rap", "spellPower", "healPower",
+    "hit", "crit", "spellHit", "spellCrit", "spellPen", "mp5", "mp5WhileCasting",
+    "haste", "armorPen",
+    "defense", "dodge", "parry", "block", "blockValue",
+    "resFire", "resNature", "resFrost", "resShadow", "resArcane",
+    "weaponDps", "rangedDps"
+  ],
+
+  "_extraStatsComment": [
+    "haste is percent attack speed, armorPen is flat armour ignored, and mp5WhileCasting is the",
+    "percentage of mana regeneration that continues while casting. All three come from Equip lines",
+    "rather than the base stat block. Weight them per spec; a spec that omits a key simply scores",
+    "it as zero."
+  ],
+
+  "_defaultsComment": [
+    "Baseline weights merged underneath every spec's own, so the handful of stats that behave the",
+    "same across a whole archetype are stated once. A spec's own weights always win.",
+    "Archetype is derived: role 'healer' -> healer, role 'tank' -> tank, a dps spec with a 'school'",
+    "-> caster, anything else -> melee."
+  ],
+  "defaults": {
+    "melee":  { "haste": 14, "armorPen": 0.15, "leech": 2 },
+    "caster": { "mp5WhileCasting": 0.8 },
+    "healer": { "mp5WhileCasting": 1.5 },
+    "tank":   { "haste": 4, "armorPen": 0, "leech": 4 }
+  },
+
+  "classes": [
+    {
+      "id": "warrior",
+      "name": "Warrior",
+      "color": "#C79C6E",
+      "armor": ["cloth", "leather", "mail", "plate"],
+      "preferredArmor": "plate",
+      "weapons": {
+        "oneHand": ["axe", "mace", "sword", "dagger", "fist"],
+        "twoHand": ["axe", "mace", "sword", "polearm", "staff"],
+        "shield": true
+      },
+      "ranged": ["bow", "gun", "crossbow", "thrown"],
+      "specs": [
+        {
+          "id": "arms", "name": "Arms", "role": "dps", "weaponStyle": "twohand",
+          "weights": { "str": 2.2, "agi": 1.4, "sta": 0.1, "ap": 1.0, "crit": 30, "hit": 32, "weaponDps": 12, "resFire": 0.1 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 8 } }
+        },
+        {
+          "id": "fury", "name": "Fury", "role": "dps", "weaponStyle": "dualwield",
+          "weights": { "str": 2.2, "agi": 1.4, "sta": 0.1, "ap": 1.0, "crit": 22, "hit": 38, "weaponDps": 7, "resFire": 0.1 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 12 } }
+        },
+        {
+          "id": "protection", "name": "Protection", "role": "tank", "weaponStyle": "onehandshield",
+          "weights": { "str": 1.0, "agi": 1.6, "sta": 3.2, "ap": 0.3, "armor": 0.16, "defense": 42, "dodge": 30, "parry": 30, "block": 14, "blockValue": 2.5, "hit": 10, "crit": 7, "resFire": 0.6, "resNature": 0.3, "resShadow": 0.3, "weaponDps": 1.5 },
+          "caps": { "defense": { "cap": 100, "postCapWeight": 20 } }
+        }
+      ]
+    },
+
+    {
+      "id": "paladin",
+      "name": "Paladin",
+      "color": "#F58CBA",
+      "armor": ["cloth", "leather", "mail", "plate"],
+      "preferredArmor": "plate",
+      "weapons": {
+        "oneHand": ["axe", "mace", "sword"],
+        "twoHand": ["axe", "mace", "sword", "polearm"],
+        "shield": true
+      },
+      "ranged": ["libram"],
+      "specs": [
+        {
+          "id": "holy", "name": "Holy", "role": "healer", "school": "holy", "weaponStyle": "onehandshield",
+          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.36, "spi": 0.12, "mp5": 6.5, "spellCrit": 9, "sta": 0.06, "str": 0.02 }
+        },
+        {
+          "id": "retribution", "name": "Retribution", "role": "dps", "weaponStyle": "twohand",
+          "weights": { "str": 2.2, "agi": 1.1, "sta": 0.1, "int": 0.05, "ap": 1.0, "crit": 26, "hit": 30, "weaponDps": 13, "spellPower": 0.25 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 8 } }
+        },
+        {
+          "id": "protection", "name": "Protection", "role": "tank", "weaponStyle": "onehandshield",
+          "weights": { "str": 1.1, "agi": 1.4, "sta": 3.0, "int": 0.15, "ap": 0.3, "armor": 0.16, "defense": 40, "dodge": 28, "parry": 28, "block": 16, "blockValue": 3.0, "hit": 9, "crit": 7, "spellPower": 0.3, "resFire": 0.5, "resShadow": 0.3 },
+          "caps": { "defense": { "cap": 100, "postCapWeight": 20 } }
+        }
+      ]
+    },
+
+    {
+      "id": "hunter",
+      "name": "Hunter",
+      "color": "#ABD473",
+      "armor": ["cloth", "leather", "mail"],
+      "preferredArmor": "mail",
+      "weapons": {
+        "oneHand": ["axe", "sword", "dagger", "fist"],
+        "twoHand": ["axe", "sword", "polearm", "staff"],
+        "shield": false
+      },
+      "ranged": ["bow", "gun", "crossbow", "thrown"],
+      "specs": [
+        {
+          "id": "beastmastery", "name": "Beast Mastery", "role": "dps", "weaponStyle": "stats",
+          "weights": { "agi": 1.8, "str": 0.1, "sta": 0.1, "int": 0.12, "rap": 1.0, "ap": 0.35, "crit": 28, "hit": 33, "rangedDps": 16, "mp5": 1.5, "haste": 2 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 9 } }
+        },
+        {
+          "id": "marksmanship", "name": "Marksmanship", "role": "dps", "weaponStyle": "stats",
+          "weights": { "agi": 1.85, "str": 0.1, "sta": 0.1, "int": 0.15, "rap": 1.0, "ap": 0.3, "crit": 30, "hit": 34, "rangedDps": 18, "mp5": 1.8, "haste": 2 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 9 } }
+        },
+        {
+          "id": "survival", "name": "Survival", "role": "dps", "weaponStyle": "stats",
+          "weights": { "agi": 2.0, "str": 0.2, "sta": 0.15, "int": 0.12, "rap": 1.0, "ap": 0.4, "crit": 27, "hit": 33, "rangedDps": 15, "weaponDps": 1.5, "mp5": 1.5, "haste": 2 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 9 } }
+        }
+      ]
+    },
+
+    {
+      "id": "rogue",
+      "name": "Rogue",
+      "color": "#FFF569",
+      "armor": ["cloth", "leather"],
+      "preferredArmor": "leather",
+      "weapons": {
+        "oneHand": ["dagger", "sword", "mace", "fist"],
+        "twoHand": [],
+        "shield": false
+      },
+      "ranged": ["bow", "gun", "crossbow", "thrown"],
+      "specs": [
+        {
+          "id": "combat", "name": "Combat", "role": "dps", "weaponStyle": "dualwield",
+          "weights": { "agi": 2.0, "str": 1.0, "sta": 0.1, "ap": 1.0, "crit": 24, "hit": 36, "weaponDps": 9 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 12 } }
+        },
+        {
+          "id": "assassination", "name": "Assassination", "role": "dps", "weaponStyle": "dualwield",
+          "weights": { "agi": 2.1, "str": 1.0, "sta": 0.1, "ap": 1.0, "crit": 27, "hit": 34, "weaponDps": 7 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 11 } }
+        },
+        {
+          "id": "subtlety", "name": "Subtlety", "role": "dps", "weaponStyle": "dualwield",
+          "weights": { "agi": 2.1, "str": 0.9, "sta": 0.15, "ap": 1.0, "crit": 25, "hit": 34, "weaponDps": 7 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 11 } }
+        }
+      ]
+    },
+
+    {
+      "id": "priest",
+      "name": "Priest",
+      "color": "#FFFFFF",
+      "armor": ["cloth"],
+      "preferredArmor": "cloth",
+      "weapons": {
+        "oneHand": ["dagger", "mace"],
+        "twoHand": ["staff"],
+        "shield": true
+      },
+      "ranged": ["wand"],
+      "specs": [
+        {
+          "id": "holy", "name": "Holy", "role": "healer", "school": "holy", "weaponStyle": "stats",
+          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.38, "spi": 0.22, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
+        },
+        {
+          "id": "discipline", "name": "Discipline", "role": "healer", "school": "holy", "weaponStyle": "stats",
+          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.42, "spi": 0.18, "mp5": 7.0, "spellCrit": 9, "sta": 0.06 }
+        },
+        {
+          "id": "shadow", "name": "Shadow", "role": "dps", "school": "shadow", "weaponStyle": "stats",
+          "weights": { "spellPower": 1.0, "int": 0.32, "spi": 0.12, "spellHit": 13, "spellCrit": 10, "spellPen": 0.35, "mp5": 2.5, "sta": 0.06 },
+          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+        }
+      ]
+    },
+
+    {
+      "id": "shaman",
+      "name": "Shaman",
+      "color": "#0070DE",
+      "armor": ["cloth", "leather", "mail"],
+      "preferredArmor": "mail",
+      "weapons": {
+        "oneHand": ["axe", "mace", "dagger", "fist"],
+        "twoHand": ["axe", "mace", "staff"],
+        "shield": true
+      },
+      "ranged": ["totem"],
+      "specs": [
+        {
+          "id": "elemental", "name": "Elemental", "role": "dps", "school": "nature", "weaponStyle": "stats",
+          "weights": { "spellPower": 1.0, "int": 0.35, "spi": 0.1, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 3.0, "sta": 0.06 },
+          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+        },
+        {
+          "id": "enhancement", "name": "Enhancement", "role": "dps", "weaponStyle": "dualwield",
+          "weights": { "str": 2.0, "agi": 1.5, "sta": 0.15, "int": 0.1, "ap": 1.0, "crit": 24, "hit": 34, "weaponDps": 8, "spellPower": 0.2, "mp5": 1.5 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 11 } }
+        },
+        {
+          "id": "restoration", "name": "Restoration", "role": "healer", "school": "nature", "weaponStyle": "stats",
+          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.4, "spi": 0.15, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
+        }
+      ]
+    },
+
+    {
+      "id": "mage",
+      "name": "Mage",
+      "color": "#69CCF0",
+      "armor": ["cloth"],
+      "preferredArmor": "cloth",
+      "weapons": {
+        "oneHand": ["dagger", "sword"],
+        "twoHand": ["staff"],
+        "shield": false
+      },
+      "ranged": ["wand"],
+      "specs": [
+        {
+          "id": "fire", "name": "Fire", "role": "dps", "school": "fire", "weaponStyle": "stats",
+          "weights": { "spellPower": 1.0, "int": 0.33, "spi": 0.08, "spellHit": 14, "spellCrit": 13, "spellPen": 0.3, "mp5": 2.5, "sta": 0.06 },
+          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+        },
+        {
+          "id": "frost", "name": "Frost", "role": "dps", "school": "frost", "weaponStyle": "stats",
+          "weights": { "spellPower": 1.0, "int": 0.33, "spi": 0.08, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 2.5, "sta": 0.06 },
+          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+        },
+        {
+          "id": "arcane", "name": "Arcane", "role": "dps", "school": "arcane", "weaponStyle": "stats",
+          "weights": { "spellPower": 1.0, "int": 0.45, "spi": 0.1, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 3.5, "sta": 0.06 },
+          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+        }
+      ]
+    },
+
+    {
+      "id": "warlock",
+      "name": "Warlock",
+      "color": "#9482C9",
+      "armor": ["cloth"],
+      "preferredArmor": "cloth",
+      "weapons": {
+        "oneHand": ["dagger", "sword"],
+        "twoHand": ["staff"],
+        "shield": false
+      },
+      "ranged": ["wand"],
+      "specs": [
+        {
+          "id": "destruction", "name": "Destruction", "role": "dps", "school": "fire", "weaponStyle": "stats",
+          "weights": { "spellPower": 1.0, "int": 0.32, "spi": 0.08, "spellHit": 14, "spellCrit": 12, "spellPen": 0.3, "mp5": 2.0, "sta": 0.08 },
+          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+        },
+        {
+          "id": "affliction", "name": "Affliction", "role": "dps", "school": "shadow", "weaponStyle": "stats",
+          "weights": { "spellPower": 1.0, "int": 0.32, "spi": 0.1, "spellHit": 16, "spellCrit": 8, "spellPen": 0.35, "mp5": 2.0, "sta": 0.08 },
+          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+        },
+        {
+          "id": "demonology", "name": "Demonology", "role": "dps", "school": "shadow", "weaponStyle": "stats",
+          "weights": { "spellPower": 1.0, "int": 0.34, "spi": 0.1, "spellHit": 14, "spellCrit": 9, "spellPen": 0.3, "mp5": 2.0, "sta": 0.12 },
+          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+        }
+      ]
+    },
+
+    {
+      "id": "druid",
+      "name": "Druid",
+      "color": "#FF7D0A",
+      "armor": ["cloth", "leather"],
+      "preferredArmor": "leather",
+      "weapons": {
+        "oneHand": ["dagger", "mace", "fist"],
+        "twoHand": ["mace", "staff", "polearm"],
+        "shield": false
+      },
+      "ranged": ["idol"],
+      "specs": [
+        {
+          "id": "balance", "name": "Balance", "role": "dps", "school": "arcane", "weaponStyle": "stats",
+          "weights": { "spellPower": 1.0, "int": 0.33, "spi": 0.1, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 2.5, "sta": 0.06 },
+          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+        },
+        {
+          "id": "feral", "name": "Feral (Cat)", "role": "dps", "weaponStyle": "stats",
+          "weights": { "str": 2.0, "agi": 1.9, "sta": 0.15, "ap": 1.0, "crit": 25, "hit": 33, "int": 0.05 },
+          "caps": { "hit": { "cap": 9, "postCapWeight": 10 } }
+        },
+        {
+          "id": "guardian", "name": "Feral (Bear)", "role": "tank", "weaponStyle": "stats",
+          "weights": { "str": 1.0, "agi": 1.8, "sta": 3.2, "ap": 0.3, "armor": 0.22, "dodge": 30, "hit": 9, "crit": 7, "resFire": 0.4, "resNature": 0.3 }
+        },
+        {
+          "id": "restoration", "name": "Restoration", "role": "healer", "school": "nature", "weaponStyle": "stats",
+          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.4, "spi": 0.18, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
+        }
+      ]
+    }
+  ]
+}

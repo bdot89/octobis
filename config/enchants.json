@@ -1,0 +1,16 @@
+{
+  "_comment": [
+    "Overrides for scraped enchant data.",
+    "",
+    "The enchant, buckle and gem list in data/enchants.json is scraped from the database, including",
+    "the effect wording and the stats parsed out of it. This file only exists to correct or annotate",
+    "individual entries where that parse is wrong or needs explaining.",
+    "",
+    "Keys are the enchant name exactly as data/enchants.json records it. A 'note' is shown to the",
+    "user; any stat keys replace the scraped ones entirely.",
+    "",
+    "Proc and timed effects are already excluded by the scraper and shown as unscored, so they do",
+    "not need entries here."
+  ],
+  "stats": {}
+}

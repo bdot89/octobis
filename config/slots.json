@@ -1,0 +1,48 @@
+{
+  "_comment": "Display slots for the BiS table, in render order. invTypes are WoW inventory-type ids as reported by the OctoWoW database listview 'slot' field. count>1 means the engine picks that many distinct items (rings, trinkets).",
+  "slots": [
+    { "id": "head",     "name": "Head",     "invTypes": [1] },
+    { "id": "neck",     "name": "Neck",     "invTypes": [2] },
+    { "id": "shoulder", "name": "Shoulder", "invTypes": [3] },
+    { "id": "back",     "name": "Back",     "invTypes": [16] },
+    { "id": "chest",    "name": "Chest",    "invTypes": [5, 20] },
+    { "id": "wrist",    "name": "Wrist",    "invTypes": [9] },
+    { "id": "hands",    "name": "Hands",    "invTypes": [10] },
+    { "id": "waist",    "name": "Waist",    "invTypes": [6] },
+    { "id": "legs",     "name": "Legs",     "invTypes": [7] },
+    { "id": "feet",     "name": "Feet",     "invTypes": [8] },
+    { "id": "finger",   "name": "Ring",     "invTypes": [11], "count": 2 },
+    { "id": "trinket",  "name": "Trinket",  "invTypes": [12], "count": 2 },
+    { "id": "weapon",   "name": "Weapon",   "invTypes": [13, 14, 17, 21, 22, 23], "special": "weapon" },
+    { "id": "ranged",   "name": "Ranged / Relic", "invTypes": [15, 25, 26, 28] }
+  ],
+
+  "_weaponComment": "The weapon slot is resolved by the engine as a combination, not a single pick. mainHand accepts inv types 13 (one-hand) and 21 (main hand); offHand accepts 13/22 (dual wield), 14 (shield) and 23 (held in off-hand); twoHand accepts 17.",
+  "weaponInvTypes": {
+    "mainHand": [13, 21],
+    "offHandWeapon": [13, 22],
+    "shield": [14],
+    "heldInOffHand": [23],
+    "twoHand": [17]
+  },
+
+  "_itemClassComment": "Mirrors the database's classs/subclass numbering, used for proficiency and armour-type filtering.",
+  "itemClasses": {
+    "2": {
+      "name": "Weapon",
+      "subclasses": {
+        "0": "axe1h", "1": "axe2h", "2": "bow", "3": "gun", "4": "mace1h",
+        "5": "mace2h", "6": "polearm", "7": "sword1h", "8": "sword2h",
+        "10": "staff", "13": "fist", "14": "misc", "15": "dagger",
+        "16": "thrown", "18": "crossbow", "19": "wand", "20": "fishingpole"
+      }
+    },
+    "4": {
+      "name": "Armor",
+      "subclasses": {
+        "0": "misc", "1": "cloth", "2": "leather", "3": "mail", "4": "plate",
+        "6": "shield", "7": "libram", "8": "idol", "9": "totem"
+      }
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "_comment": [
+    "The editorial layer that sits on top of the auto-ranker. Everything here is optional; an empty",
+    "file produces a purely stat-weight-driven site.",
+    "",
+    "Scope keys are matched most-specific-first:",
+    "  'warrior.fury.p2'  a single spec in a single phase",
+    "  'warrior.fury'     a spec in every phase",
+    "  'warrior'          every spec of a class",
+    "  '*'                everything",
+    "",
+    "  pin      itemId -> slot. Forces the item into that slot regardless of score.",
+    "  exclude  [itemId]. Removes the item from consideration entirely.",
+    "  bonus    itemId -> number. Added to the item's score. Use for set bonuses, on-use and proc",
+    "           effects, and weapon-speed breakpoints the parser cannot see. Scale matches the",
+    "           spec's weights, so for a physical spec a bonus of 50 is worth 50 attack power.",
+    "  note     itemId -> string. Shown in the UI next to the item. Any item carrying a pin, a",
+    "           bonus or a note is badged as manually adjusted so the reasoning is visible.",
+    "",
+    "The entries below are illustrative starting points, not a finished curation pass."
+  ],
+
+  "_scopeWarning": [
+    "Resist the temptation to put item bonuses in the '*' scope. A bonus there applies to casters",
+    "and healers too: Drake Fang Talisman under '*' pushed a melee trinket into a Fire mage's list,",
+    "because the bonus outweighed the fact that none of its stats are useful to a caster. Physical",
+    "bonuses belong on the physical classes, and vice versa."
+  ],
+
+  "scopes": {
+    "warrior": {
+      "bonus": { "19406": 120, "17069": 90 },
+      "note": {
+        "19406": "Drake Fang Talisman - the hit is worth far more than its raw stats suggest for any spec still under the hit cap.",
+        "17069": "Striker's Mark - stat stick plus a strong ranged attack power contribution."
+      }
+    },
+    "rogue": {
+      "bonus": { "19406": 120, "17069": 90 },
+      "note": {
+        "19406": "Drake Fang Talisman - the hit is worth far more than its raw stats suggest for any spec still under the hit cap.",
+        "17069": "Striker's Mark - stat stick plus a strong ranged attack power contribution."
+      }
+    },
+    "hunter": {
+      "bonus": { "19406": 100 },
+      "note": { "19406": "Drake Fang Talisman - strong while still under the hit cap." }
+    },
+    "paladin.retribution": {
+      "bonus": { "19406": 120 },
+      "note": { "19406": "Drake Fang Talisman - strong while still under the hit cap." }
+    },
+    "shaman.enhancement": {
+      "bonus": { "19406": 120 },
+      "note": { "19406": "Drake Fang Talisman - strong while still under the hit cap." }
+    },
+    "druid.feral": {
+      "bonus": { "19406": 120 },
+      "note": { "19406": "Drake Fang Talisman - strong while still under the hit cap." }
+    },
+
+    "warrior.protection": {
+      "note": {
+        "12640": "Lionheart Helm is a threat/DPS helm; for pure mitigation prefer the defensive alternatives listed below."
+      }
+    },
+
+    "rogue.combat": {
+      "note": {
+        "_": "Combat rogues want a slow main hand and a fast off hand. The engine scores weapon DPS only, so check the speed column before committing to a pairing."
+      }
+    }
+  }
+}

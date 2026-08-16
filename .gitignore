@@ -1,0 +1,8 @@
+bin/
+obj/
+.cache/
+*.user
+.vs/
+
+# scraper / server run logs
+*.log

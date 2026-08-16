@@ -1,0 +1,44 @@
+{
+  "_comment": [
+    "Playable races and their class combinations.",
+    "",
+    "The base list is vanilla, plus the two races OctoWoW advertises as additions - Goblins and",
+    "High Elves. The server also states that it opens up new race/class combinations beyond",
+    "vanilla's, and those are not published in a form worth guessing at, so the combinations below",
+    "are vanilla's with the two new races filled in by the closest reasonable analogue.",
+    "",
+    "This only ever restricts which classes a character can be created as. If a combination here is",
+    "wrong, fix it in this file - nothing else reads race data."
+  ],
+
+  "factions": {
+    "alliance": { "name": "Alliance", "color": "#4a90d9" },
+    "horde": { "name": "Horde", "color": "#c0392b" }
+  },
+
+  "races": [
+    { "id": "human",    "name": "Human",    "faction": "alliance", "icon": "race_human_male",
+      "classes": ["warrior", "paladin", "rogue", "priest", "mage", "warlock"] },
+    { "id": "dwarf",    "name": "Dwarf",    "faction": "alliance", "icon": "race_dwarf_male",
+      "classes": ["warrior", "paladin", "hunter", "rogue", "priest"] },
+    { "id": "nightelf", "name": "Night Elf", "faction": "alliance", "icon": "race_nightelf_male",
+      "classes": ["warrior", "hunter", "rogue", "priest", "druid"] },
+    { "id": "gnome",    "name": "Gnome",    "faction": "alliance", "icon": "race_gnome_male",
+      "classes": ["warrior", "rogue", "mage", "warlock"] },
+    { "id": "highelf",  "name": "High Elf", "faction": "alliance", "icon": "race_bloodelf_male",
+      "custom": true,
+      "classes": ["hunter", "rogue", "priest", "mage", "warlock", "paladin"] },
+
+    { "id": "orc",      "name": "Orc",      "faction": "horde", "icon": "race_orc_male",
+      "classes": ["warrior", "hunter", "rogue", "shaman", "warlock"] },
+    { "id": "undead",   "name": "Undead",   "faction": "horde", "icon": "race_scourge_male",
+      "classes": ["warrior", "rogue", "priest", "mage", "warlock"] },
+    { "id": "tauren",   "name": "Tauren",   "faction": "horde", "icon": "race_tauren_male",
+      "classes": ["warrior", "hunter", "shaman", "druid"] },
+    { "id": "troll",    "name": "Troll",    "faction": "horde", "icon": "race_troll_male",
+      "classes": ["warrior", "hunter", "rogue", "priest", "shaman", "mage"] },
+    { "id": "goblin",   "name": "Goblin",   "faction": "horde", "icon": "race_goblin_male",
+      "custom": true,
+      "classes": ["warrior", "hunter", "rogue", "shaman", "mage", "warlock"] }
+  ]
+}
