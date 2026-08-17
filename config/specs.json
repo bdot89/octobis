@@ -63,12 +63,12 @@
         {
           "id": "arms", "name": "Arms", "role": "dps", "weaponStyle": "twohand",
           "weights": { "str": 2.2, "agi": 1.4, "sta": 0.1, "ap": 1.0, "crit": 30, "hit": 32, "weaponDps": 12, "resFire": 0.1 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 8 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "fury", "name": "Fury", "role": "dps", "weaponStyle": "dualwield",
           "weights": { "str": 2.2, "agi": 1.4, "sta": 0.1, "ap": 1.0, "crit": 22, "hit": 38, "weaponDps": 7, "resFire": 0.1 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 12 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "protection", "name": "Protection", "role": "tank", "weaponStyle": "onehandshield",
@@ -98,7 +98,7 @@
         {
           "id": "retribution", "name": "Retribution", "role": "dps", "weaponStyle": "twohand",
           "weights": { "str": 2.2, "agi": 1.1, "sta": 0.1, "int": 0.05, "ap": 1.0, "crit": 26, "hit": 30, "weaponDps": 13, "spellPower": 0.25 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 8 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "protection", "name": "Protection", "role": "tank", "weaponStyle": "onehandshield",
@@ -124,17 +124,17 @@
         {
           "id": "beastmastery", "name": "Beast Mastery", "role": "dps", "weaponStyle": "stats",
           "weights": { "agi": 1.8, "str": 0.1, "sta": 0.1, "int": 0.12, "rap": 1.0, "ap": 0.35, "crit": 28, "hit": 33, "rangedDps": 16, "mp5": 1.5, "haste": 2 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 9 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "marksmanship", "name": "Marksmanship", "role": "dps", "weaponStyle": "stats",
           "weights": { "agi": 1.85, "str": 0.1, "sta": 0.1, "int": 0.15, "rap": 1.0, "ap": 0.3, "crit": 30, "hit": 34, "rangedDps": 18, "mp5": 1.8, "haste": 2 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 9 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "survival", "name": "Survival", "role": "dps", "weaponStyle": "stats",
           "weights": { "agi": 2.0, "str": 0.2, "sta": 0.15, "int": 0.12, "rap": 1.0, "ap": 0.4, "crit": 27, "hit": 33, "rangedDps": 15, "weaponDps": 1.5, "mp5": 1.5, "haste": 2 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 9 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         }
       ]
     },
@@ -155,17 +155,17 @@
         {
           "id": "combat", "name": "Combat", "role": "dps", "weaponStyle": "dualwield",
           "weights": { "agi": 2.0, "str": 1.0, "sta": 0.1, "ap": 1.0, "crit": 24, "hit": 36, "weaponDps": 9 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 12 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "assassination", "name": "Assassination", "role": "dps", "weaponStyle": "dualwield",
           "weights": { "agi": 2.1, "str": 1.0, "sta": 0.1, "ap": 1.0, "crit": 27, "hit": 34, "weaponDps": 7 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 11 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "subtlety", "name": "Subtlety", "role": "dps", "weaponStyle": "dualwield",
           "weights": { "agi": 2.1, "str": 0.9, "sta": 0.15, "ap": 1.0, "crit": 25, "hit": 34, "weaponDps": 7 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 11 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         }
       ]
     },
@@ -220,7 +220,7 @@
         {
           "id": "enhancement", "name": "Enhancement", "role": "dps", "weaponStyle": "dualwield",
           "weights": { "str": 2.0, "agi": 1.5, "sta": 0.15, "int": 0.1, "ap": 1.0, "crit": 24, "hit": 34, "weaponDps": 8, "spellPower": 0.2, "mp5": 1.5 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 11 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "restoration", "name": "Restoration", "role": "healer", "school": "nature", "weaponStyle": "stats",
@@ -312,7 +312,7 @@
         {
           "id": "feral", "name": "Feral (Cat)", "role": "dps", "weaponStyle": "stats",
           "weights": { "str": 2.0, "agi": 1.9, "sta": 0.15, "ap": 1.0, "crit": 25, "hit": 33, "int": 0.05 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 10 } }
+          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "guardian", "name": "Feral (Bear)", "role": "tank", "weaponStyle": "stats",

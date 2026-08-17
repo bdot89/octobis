@@ -182,7 +182,18 @@ public static partial class ItemPageParser
 
         if (EffectRegex().Match(line) is { Success: true } effect)
         {
-            if (ApplyEffect(effect.Groups[2].Value.Trim(), item)) return;
+            var kind = effect.Groups[1].Value;
+            var text = effect.Groups[2].Value.Trim();
+
+            // Only "Equip:" grants a stat you actually have. "Use:" and "Chance on hit:" are
+            // temporary, and reading them as permanent is badly wrong rather than slightly wrong:
+            // Manual Crowd Pummeler's 30-second attack speed charge parsed as a flat +50% haste,
+            // which made a level 29 mace outscore every raid weapon in the game.
+            var permanent = kind.Equals("Equip", StringComparison.OrdinalIgnoreCase)
+                            && !TimedOrConditionalRegex().IsMatch(text);
+
+            if (permanent && ApplyEffect(text, item)) return;
+
             item.Notes.Add(line);
             unmatched?.Add(line);
             return;
@@ -374,6 +385,18 @@ public static partial class ItemPageParser
     // after the plus as well as instead of it.
     [GeneratedRegex(@"^([+-]?-?[\d.]+) ([A-Za-z ]+)$")] private static partial Regex PlainStatRegex();
     [GeneratedRegex(@"^(Equip|Use|Chance on hit):\s*(.+)$", RegexOptions.IgnoreCase)] private static partial Regex EffectRegex();
+
+    /// <summary>
+    /// Wording that marks an effect as temporary or conditional rather than always on.
+    ///
+    /// "chance to" cannot be a proc marker on its own. Half the permanent percentage stats in
+    /// vanilla are phrased that way - chance to hit, to crit, to dodge, parry, block - so matching
+    /// it blindly strips real stats off most of the database. Only the combat-log verbs that follow
+    /// it ("chance to deal", "chance to strike") indicate an actual proc.
+    /// </summary>
+    [GeneratedRegex(@"for \d+ sec|sometimes|occasionally|when struck|on hit|next \d+|temporarily|chance to (?!hit\b|get a critical|dodge|parry|block|resist|crit)",
+                    RegexOptions.IgnoreCase)]
+    private static partial Regex TimedOrConditionalRegex();
     [GeneratedRegex(@"^Classes:\s*(.+)$", RegexOptions.IgnoreCase)] private static partial Regex ClassesRegex();
     [GeneratedRegex(@"^Requires Level (\d+)$", RegexOptions.IgnoreCase)] private static partial Regex RequiresLevelRegex();
     [GeneratedRegex(@"^Durability \d+ / \d+$", RegexOptions.IgnoreCase)] private static partial Regex DurabilityRegex();

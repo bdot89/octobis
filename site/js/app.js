@@ -7,6 +7,7 @@ import { buildBis } from './score.js';
 import { candidatesFor, normalise, autoFill } from './equipped.js';
 import { renderTalents, addPoint, removePoint, treesFor } from './talents.js';
 import { renderGuide } from './guide.js';
+import { hitProfile } from './hit.js';
 import { forSlot as enchantsForSlot, appliedStats, find as findEnchant } from './enchants.js';
 import { slotByKey, siblingSlots, isTwoHanded } from './slots.js';
 import { attachTooltips } from './tooltip.js';
@@ -451,7 +452,8 @@ function wire() {
 
     if (event.target.closest('#auto-fill')) {
       const equipped = autoFill(
-        data, character, specOf(character), classOf(character), phaseId, overridesOf(character));
+        data, character, specOf(character), classOf(character), phaseId, overridesOf(character),
+        hitBudgetFor(character));
       Characters.equipMany(character, phaseId, equipped);
       render();
       return;
@@ -581,6 +583,28 @@ function wire() {
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') { closeModals(); closeDropdowns(); }
   });
+}
+
+/**
+ * The hit ceiling auto-fill should respect: the cap for whatever this loadout fights, less the hit
+ * talents and enchants already provide. PvE gears against bosses, PvP against players.
+ */
+function hitBudgetFor(character) {
+  const spec = specOf(character);
+  const profile = hitProfile(
+    data, data.hitcaps, character, spec, {}, Characters.talentsFor(character),
+    Characters.weaponSkill(character, data.hitcaps.weaponSkill?.base ?? 300),
+    Characters.enchantsFor(character, phaseId));
+
+  const targetId = Characters.activeMode() === 'pvp' ? 'pvp' : 'boss';
+  const target = profile.targets.find(t => t.id === targetId) ?? profile.targets[0];
+
+  return {
+    statKey: profile.kind === 'spell' ? 'spellHit' : 'hit',
+    cap: target.cap,
+    // Talents and enchants are already banked before a single item is chosen.
+    alreadyHave: profile.total
+  };
 }
 
 function adjustTalent(button, direction) {

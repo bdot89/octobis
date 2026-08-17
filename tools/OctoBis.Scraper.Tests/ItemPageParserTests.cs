@@ -120,6 +120,38 @@ public class ItemPageParserTests
     }
 
     [Fact]
+    public void TemporaryUseEffectsAreNotScoredAsPermanentStats()
+    {
+        // Manual Crowd Pummeler's 30-second charge parsed as a flat +50% attack speed, which made
+        // a level 29 mace outscore every raid weapon in the game.
+        const string html = """
+            <td><table><tr><td><b class="q3">Manual Crowd Pummeler</b><table width="100%"><tr><td>Two-hand</td><th>Mace</th></tr></table>+16 Strength<br /></td></tr></table><table><tr><td><span class="q2">Use: <a href="?spell=13494">Increases your attack speed by 50% for 30 sec.</a></span><br /></td></tr></table>
+            """;
+
+        var item = ItemPageParser.Parse(html, 9449)!;
+
+        Assert.False(item.Stats.ContainsKey("haste"));
+        Assert.Equal(16, item.Stats["str"]);
+        Assert.Contains(item.Notes, note => note.Contains("attack speed by 50%"));
+    }
+
+    [Fact]
+    public void PermanentPercentageStatsSurviveTheProcFilter()
+    {
+        // Guards the over-correction: vanilla phrases permanent hit, crit, dodge, parry and block
+        // as "chance to ...", so a blanket "chance to" proc filter strips real stats everywhere.
+        const string html = """
+            <td><table><tr><td><b class="q4">Test Trinket</b><table width="100%"><tr><td>Trinket</td><th>Miscellaneous</th></tr></table></td></tr></table><table><tr><td><span class="q2">Equip: <a href="?spell=1">Improves your chance to hit by 2%.</a></span><br /><span class="q2">Equip: <a href="?spell=2">Improves your chance to get a critical strike by 1%.</a></span><br /><span class="q2">Equip: <a href="?spell=3">Increases your chance to dodge an attack by 1%.</a></span><br /></td></tr></table>
+            """;
+
+        var item = ItemPageParser.Parse(html, 1)!;
+
+        Assert.Equal(2, item.Stats["hit"]);
+        Assert.Equal(1, item.Stats["crit"]);
+        Assert.Equal(1, item.Stats["dodge"]);
+    }
+
+    [Fact]
     public void ReturnsNullWhenThePageHasNoItemTooltip()
     {
         Assert.Null(ItemPageParser.Parse("<html><body>Not an item page</body></html>", 1));

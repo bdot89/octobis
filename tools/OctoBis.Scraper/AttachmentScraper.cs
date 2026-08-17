@@ -303,7 +303,12 @@ public sealed partial class AttachmentScraper
         (new(@"spell damage[^.]{0,20}by (?:up to )?(?<v>\d+)", RegexOptions.IgnoreCase), "spellPower")
     };
 
-    [GeneratedRegex(@"for \d+ sec|chance (?:to|of)|sometimes|occasionally|often|when struck|on hit|temporarily",
+    /// <summary>
+    /// Proc wording. "chance to" is deliberately narrowed: permanent hit and crit read as
+    /// "chance to hit" and "chance to get a critical strike", and matching those as procs throws
+    /// away real stats.
+    /// </summary>
+    [GeneratedRegex(@"for \d+ sec|sometimes|occasionally|often|when struck|on hit|temporarily|chance to (?!hit\b|get a critical|dodge|parry|block|resist|crit)",
                     RegexOptions.IgnoreCase)]
     private static partial Regex ProcRegex();
 

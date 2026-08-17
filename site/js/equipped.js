@@ -41,26 +41,113 @@ export function normalise(candidates) {
 /**
  * Picks a full set greedily, slot by slot, skipping anything already used.
  *
- * Greedy is the honest choice here: a true optimiser would need to model set bonuses, and those
- * are not scored (see the README), so a more elaborate search would be false precision.
+ * Hit is handled across the whole set rather than per item. The per-item cap in specs.json cannot
+ * see the rest of your gear, so every piece looks individually under the cap and greedy selection
+ * happily stacks hit to nearly twice what a boss needs. Here the budget is tracked as slots fill,
+ * and hit beyond it is valued at the spec's post-cap weight - which is what stops the pile-up.
+ *
+ * Greedy is otherwise the honest choice: a true optimiser would need to model set bonuses, and
+ * those are not scored (see the README), so a more elaborate search would be false precision.
  */
-export function autoFill(data, character, spec, classDef, phaseId, overrides) {
+export function autoFill(data, character, spec, classDef, phaseId, overrides, hitBudget = null) {
   const equipped = {};
   const used = new Set();
+
+  const statKey = hitBudget?.statKey ?? null;
+  const weight = statKey ? (spec.weights?.[statKey] ?? 0) : 0;
+
+  // Hit already guaranteed by talents and enchants counts against the budget from the start.
+  let hitSoFar = hitBudget?.alreadyHave ?? 0;
+  const cap = hitBudget?.cap ?? Infinity;
 
   for (const slot of ALL_SLOTS) {
     // A two-hander already occupies the off hand.
     if (slot.key === 'offhand' && isTwoHanded(data.byId.get(equipped.mainhand))) continue;
 
-    const candidates = candidatesFor(data, character, spec, classDef, phaseId, slot.key, overrides);
-    const pick = candidates.find(c => c.score > 0 && !used.has(c.item.id));
-    if (!pick) continue;
+    const candidates = candidatesFor(data, character, spec, classDef, phaseId, slot.key, overrides)
+      .filter(c => !used.has(c.item.id));
+
+    if (candidates.length === 0) continue;
+
+    const valued = statKey
+      ? candidates.map(c => {
+          const own = c.item.stats?.[statKey] ?? 0;
+          const surplus = Math.max(0, hitSoFar + own - cap);
+          const wasted = Math.min(own, surplus);
+          // Surplus hit is worth nothing here. Auto-fill treats the cap as a hard budget so it
+          // stops at it rather than piling on to 17% against a 9% cap, which is what a per-item
+          // cap allows - each piece looks fine on its own and the total runs away.
+          return { ...c, score: c.score - wasted * weight };
+        })
+      : candidates;
+
+    const pick = valued.reduce((best, c) => (best === null || c.score > best.score ? c : best), null);
+    if (!pick || pick.score <= 0) continue;
 
     equipped[slot.key] = pick.item.id;
     used.add(pick.item.id);
+    hitSoFar += pick.item.stats?.[statKey] ?? 0;
   }
 
-  return equipped;
+  return statKey ? refine(data, character, spec, classDef, phaseId, overrides, equipped, hitBudget) : equipped;
+}
+
+/**
+ * Second pass over a greedy set.
+ *
+ * Going slot by slot means early choices are made before the hit budget is spent, so a piece taken
+ * for "free" hit in the first slot can still be there once the budget is full and its hit is worth
+ * nothing. This revisits every slot knowing the whole set, and keeps swapping while something
+ * improves - which is the same comparison the guide's replacement advice makes.
+ */
+function refine(data, character, spec, classDef, phaseId, overrides, equipped, hitBudget) {
+  const { statKey, cap } = hitBudget;
+  const weight = spec.weights?.[statKey] ?? 0;
+  const baseHit = hitBudget.alreadyHave ?? 0;
+
+  const gear = { ...equipped };
+  const MAX_ROUNDS = 6;
+
+  for (let round = 0; round < MAX_ROUNDS; round++) {
+    let improved = false;
+
+    for (const slot of ALL_SLOTS) {
+      const currentId = gear[slot.key];
+      if (currentId === undefined) continue;
+      if (slot.key === 'offhand' && isTwoHanded(data.byId.get(gear.mainhand))) continue;
+
+      const inUse = new Set(Object.entries(gear).filter(([k]) => k !== slot.key).map(([, id]) => id));
+
+      // Hit the rest of the set already supplies, so this slot is judged against the true total.
+      let hitElsewhere = baseHit;
+      for (const id of inUse) hitElsewhere += data.byId.get(id)?.stats?.[statKey] ?? 0;
+
+      const value = item => {
+        const own = item.stats?.[statKey] ?? 0;
+        const wasted = Math.min(own, Math.max(0, hitElsewhere + own - cap));
+        const context = contextFor(slot);
+        return scoreItem(item, spec, overrides, context) - wasted * weight;
+      };
+
+      const currentValue = value(data.byId.get(currentId));
+
+      let best = null;
+      for (const candidate of candidatesFor(data, character, spec, classDef, phaseId, slot.key, overrides)) {
+        if (inUse.has(candidate.item.id)) continue;
+        const score = value(candidate.item);
+        if (score > currentValue && (best === null || score > best.score)) best = { item: candidate.item, score };
+      }
+
+      if (best) {
+        gear[slot.key] = best.item.id;
+        improved = true;
+      }
+    }
+
+    if (!improved) break;
+  }
+
+  return gear;
 }
 
 const SUMMARY_GROUPS = [

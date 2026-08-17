@@ -1,9 +1,9 @@
 {
-  "generated": "2026-08-16T16:25:23.1671533Z",
+  "generated": "2026-08-17T10:09:13.7932985Z",
   "databaseUrl": "https://octowow.st/db/",
   "counts": {
     "items": 4047,
-    "itemsWithStats": 3910,
+    "itemsWithStats": 3906,
     "itemsWithSources": 3509,
     "npcsCrawled": 1116,
     "itemsDetailed": 4047,
@@ -388,8 +388,8 @@
     ]
   },
   "unmatchedTooltipLines": {
-    "total": 1510,
-    "distinct": 990,
+    "total": 1528,
+    "distinct": 1006,
     "top": {
       "This Item Begins a Quest": 74,
       "Use: Adds a mount to the player\u0027s mount collection.": 69,
