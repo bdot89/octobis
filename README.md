@@ -330,5 +330,15 @@ intellectual property of Blizzard Entertainment. This project is unaffiliated wi
 
 ## Deploying
 
-`index.html` and everything it references are static, so any static host works. For GitHub Pages,
-publish from the repository root — `config/` and `data/` must be served alongside `index.html`.
+Live at **<https://bdot89.github.io/octobis/>**, served by GitHub Pages from the repository root on
+`master`. Pushing to `master` redeploys it; the build takes well under a minute.
+
+`index.html` and everything it references are static, so any other static host works the same way —
+drop `index.html`, `site/`, `config/` and `data/` in together. `tools/` is the data pipeline and is
+not needed to serve the site. A `.nojekyll` file stops Pages running the tree through Jekyll.
+
+Two things worth knowing before sharing the link widely:
+
+- The dataset is downloaded on first load, currently about 2.4MB.
+- Item icons are hotlinked from the OctoWoW database, so each visitor's page load touches their
+  server. Run the scraper with `--download-icons` to bundle them instead.
