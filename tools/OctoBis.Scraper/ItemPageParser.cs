@@ -159,6 +159,9 @@ public static partial class ItemPageParser
             var min = double.Parse(bonus.Groups[1].Value, CultureInfo.InvariantCulture);
             var max = double.Parse(bonus.Groups[2].Value, CultureInfo.InvariantCulture);
             Add(item, "weaponBonusDmg", (min + max) / 2);
+            // The averaged number is what the scorer wants; the tooltip wants the school and the
+            // range, neither of which survives the average.
+            item.BonusDamage = line;
             return;
         }
 
@@ -192,6 +195,17 @@ public static partial class ItemPageParser
             var permanent = kind.Equals("Equip", StringComparison.OrdinalIgnoreCase)
                             && !TimedOrConditionalRegex().IsMatch(text);
 
+            // Every effect line is kept for the tooltip, whether or not it also became a stat. A
+            // player hovering an item expects the sentence the game shows, and a recognised
+            // "Equip: Increases damage and healing..." would otherwise survive only as a number.
+            item.Effects.Add(new ItemEffect
+            {
+                Kind = kind.Equals("Equip", StringComparison.OrdinalIgnoreCase) ? "equip"
+                     : kind.Equals("Use", StringComparison.OrdinalIgnoreCase) ? "use"
+                     : "proc",
+                Text = text
+            });
+
             if (permanent && ApplyEffect(text, item)) return;
 
             item.Notes.Add(line);
@@ -199,12 +213,107 @@ public static partial class ItemPageParser
             return;
         }
 
-        // Everything remaining is flavour text, binding, durability, set listings and so on.
+        // Lines with no stat in them, but which the tooltip still shows.
+        if (CaptureDecoration(line, item)) return;
+
+        // Everything remaining is set listings, sell prices and so on.
         if (IsIgnorable(line)) return;
 
         item.Notes.Add(line);
         unmatched?.Add(line);
     }
+
+    /// <summary>
+    /// Reads the lines that carry no stat but belong on the tooltip: binding, uniqueness,
+    /// and durability. Returns true when the line was one of them.
+    /// </summary>
+    private static bool CaptureDecoration(string line, Item item)
+    {
+        if (BindingRegex().Match(line) is { Success: true } bind)
+        {
+            item.Binding = bind.Groups[1].Value.ToLowerInvariant() switch
+            {
+                "picked up" => "pickup",
+                "equipped" => "equip",
+                "used" => "use",
+                _ => null
+            };
+            return true;
+        }
+
+        if (line.Equals("Quest Item", StringComparison.OrdinalIgnoreCase))
+        {
+            item.Binding ??= "quest";
+            return true;
+        }
+
+        // "Unique" and "Unique (3)" both mean the same thing for display purposes.
+        if (line.Equals("Unique", StringComparison.OrdinalIgnoreCase) || UniqueCountRegex().IsMatch(line))
+        {
+            item.Unique = true;
+            return true;
+        }
+
+        if (DurabilityRegex().Match(line) is { Success: true } dur)
+        {
+            item.Durability = int.Parse(dur.Groups[1].Value);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Reads the item-set block: the other pieces, and what wearing several of them gives you.
+    ///
+    /// <see cref="ExtractTooltip"/> deliberately cuts this block off before the stat parser sees it,
+    /// because letting every tier piece's name through would drown the unmatched-line report. It is
+    /// still part of the tooltip, so it is read here instead - once per set rather than once per
+    /// piece, since all eight members of a set carry the identical block.
+    /// </summary>
+    public static ItemSetInfo? ParseSet(string html)
+    {
+        var header = ItemSetRegex().Match(html);
+        if (!header.Success) return null;
+
+        var set = new ItemSetInfo
+        {
+            Id = int.Parse(header.Groups[1].Value),
+            Name = WebUtility.HtmlDecode(header.Groups[2].Value).Trim()
+        };
+
+        // Bound the region the same way the tooltip is bounded, so comments and "related items"
+        // listviews below the tooltip cannot contribute stray item links.
+        var start = header.Index;
+        var end = html.Length;
+        foreach (var terminator in new[] { "new Listview", "<script", "id=\"infobox", "<h2", "lv_comments" })
+        {
+            var at = html.IndexOf(terminator, start, StringComparison.Ordinal);
+            if (at >= 0 && at < end) end = at;
+        }
+        var block = html[start..end];
+
+        if (SetTotalRegex().Match(block) is { Success: true } total)
+            set.Total = int.Parse(total.Groups[1].Value);
+
+        foreach (Match piece in SetPieceRegex().Matches(block))
+        {
+            var pieceId = int.Parse(piece.Groups[1].Value);
+            if (!set.Pieces.Contains(pieceId)) set.Pieces.Add(pieceId);
+        }
+
+        foreach (Match bonus in SetBonusRegex().Matches(block))
+        {
+            var text = WebUtility.HtmlDecode(StripTags(bonus.Groups[2].Value)).Trim();
+            if (text.Length == 0) continue;
+            set.Bonuses.Add(new SetBonus { Pieces = int.Parse(bonus.Groups[1].Value), Text = text });
+        }
+
+        if (set.Total == 0) set.Total = set.Pieces.Count;
+        return set;
+    }
+
+    private static string StripTags(string html) => Regex.Replace(html, "<[^>]+>", "");
 
     /// <summary>Maps an Equip/Use/Chance-on-hit sentence onto a stat. Returns false if unrecognised.</summary>
     private static bool ApplyEffect(string text, Item item)
@@ -376,6 +485,9 @@ public static partial class ItemPageParser
     [GeneratedRegex(@"<b class=""q(\d)"">([^<]+)</b>")] private static partial Regex ItemNameRegex();
     [GeneratedRegex(@"Icon\.create\('([^']+)'")] private static partial Regex IconRegex();
     [GeneratedRegex(@"\?itemset=(\d+)""[^>]*>([^<]+)</a>")] private static partial Regex ItemSetRegex();
+    [GeneratedRegex(@"\(\d+/(\d+)\)")] private static partial Regex SetTotalRegex();
+    [GeneratedRegex(@"\?item=(\d+)""[^>]*>[^<]+</a>")] private static partial Regex SetPieceRegex();
+    [GeneratedRegex(@"\((\d+)\) Set:\s*((?:<[^>]+>|[^<])+?)(?:</span>|<br)", RegexOptions.IgnoreCase)] private static partial Regex SetBonusRegex();
     [GeneratedRegex(@"^([\d.]+)\s*-\s*([\d.]+)\s+Damage$", RegexOptions.IgnoreCase)] private static partial Regex DamageRangeRegex();
     [GeneratedRegex(@"^Speed\s+([\d.]+)$", RegexOptions.IgnoreCase)] private static partial Regex SpeedRegex();
     [GeneratedRegex(@"^\(([\d.]+) damage per second\)$", RegexOptions.IgnoreCase)] private static partial Regex DpsRegex();
@@ -399,5 +511,7 @@ public static partial class ItemPageParser
     private static partial Regex TimedOrConditionalRegex();
     [GeneratedRegex(@"^Classes:\s*(.+)$", RegexOptions.IgnoreCase)] private static partial Regex ClassesRegex();
     [GeneratedRegex(@"^Requires Level (\d+)$", RegexOptions.IgnoreCase)] private static partial Regex RequiresLevelRegex();
-    [GeneratedRegex(@"^Durability \d+ / \d+$", RegexOptions.IgnoreCase)] private static partial Regex DurabilityRegex();
+    [GeneratedRegex(@"^Durability \d+ / (\d+)$", RegexOptions.IgnoreCase)] private static partial Regex DurabilityRegex();
+    [GeneratedRegex(@"^Binds when (picked up|equipped|used)$", RegexOptions.IgnoreCase)] private static partial Regex BindingRegex();
+    [GeneratedRegex(@"^Unique\s*\(\d+\)$", RegexOptions.IgnoreCase)] private static partial Regex UniqueCountRegex();
 }

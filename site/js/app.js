@@ -51,6 +51,13 @@ function overridesOf(character) {
  * hit before equipping anything, so a totals panel that counts gear alone tells them they are 10%
  * further from the cap than they really are, and the number it shows is not their character's.
  */
+/** Ids of everything the active character is wearing in the current phase and loadout. */
+function equippedIds() {
+  const character = Characters.active();
+  if (!character) return new Set();
+  return new Set(Object.values(Characters.gearFor(character, phaseId)));
+}
+
 function talentStatsFor(character, spec) {
   const contributed = talentHit(
     data.hitcaps, data.talents, character.classId, spec, Characters.talentsFor(character));
@@ -675,7 +682,9 @@ async function start() {
   }
 
   wire();
-  attachTooltips(document.body, data);
+  // Tooltips read the equipped set at hover time so an item's set block can show how many
+  // pieces you already have, and light up the bonuses you have reached.
+  attachTooltips(document.body, data, equippedIds);
   render();
 }
 

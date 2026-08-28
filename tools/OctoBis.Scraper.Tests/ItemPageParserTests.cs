@@ -152,6 +152,82 @@ public class ItemPageParserTests
     }
 
     [Fact]
+    public void CapturesTheTooltipLinesThatCarryNoStat()
+    {
+        var item = ItemPageParser.Parse(NemesisGloves, 16928)!;
+
+        Assert.Equal("pickup", item.Binding);
+        Assert.Equal(35, item.Durability);
+        Assert.False(item.Unique);
+    }
+
+    [Fact]
+    public void KeepsEveryEffectSentenceEvenWhenItAlsoBecameAStat()
+    {
+        // The three Equip lines all parse into stats. A tooltip still has to show the sentences,
+        // so they are kept alongside the numbers rather than replaced by them.
+        var item = ItemPageParser.Parse(NemesisGloves, 16928)!;
+
+        Assert.Equal(3, item.Effects.Count);
+        Assert.All(item.Effects, e => Assert.Equal("equip", e.Kind));
+        Assert.Contains(item.Effects, e => e.Text.StartsWith("Increases damage and healing"));
+        Assert.Equal(20, item.Stats["spellPower"]);   // and the stat survived too
+    }
+
+    [Fact]
+    public void DistinguishesUseAndProcEffectsFromEquipEffects()
+    {
+        const string html = """
+            <td><table><tr><td><b class="q3">Manual Crowd Pummeler</b><br />Binds when equipped<br />Unique<table width="100%"><tr><td>Two-hand</td><th>Mace</th></tr></table></td></tr></table><table><tr><td><span class="q2">Use: <a href="?spell=13494">Increases your attack speed by 50% for 30 sec.</a></span><br /><span class="q2">Chance on hit: <a href="?spell=1">Blasts the target.</a></span><br /></td></tr></table>
+            """;
+
+        var item = ItemPageParser.Parse(html, 9449)!;
+
+        Assert.Equal("equip", item.Binding);
+        Assert.True(item.Unique);
+        Assert.Equal(new[] { "use", "proc" }, item.Effects.Select(e => e.Kind));
+        Assert.False(item.Stats.ContainsKey("haste"));   // still not scored
+    }
+
+    [Fact]
+    public void KeepsBonusWeaponDamageWordingAsWellAsTheAveragedNumber()
+    {
+        const string html = """
+            <td><table><tr><td><b class="q5">Thunderfury</b><table width="100%"><tr><td>One-hand</td><th>Sword</th></tr></table><table width="100%"><tr><td>44 - 115  Damage</td><th>Speed 1.90</th></tr></table>+16 - 30 Nature Damage<br />(53.9 damage per second)<br /></td></tr></table>
+            """;
+
+        var item = ItemPageParser.Parse(html, 19019)!;
+
+        Assert.Equal("+16 - 30 Nature Damage", item.BonusDamage);
+        Assert.Equal(23, item.Stats["weaponBonusDmg"]);
+    }
+
+    [Fact]
+    public void ReadsTheSetBlockPiecesAndBonuses()
+    {
+        var set = ItemPageParser.ParseSet(NemesisGloves);
+
+        Assert.NotNull(set);
+        Assert.Equal(212, set!.Id);
+        Assert.Equal("Nemesis Raiment", set.Name);
+        Assert.Equal(8, set.Total);                            // from the "(0/8)" counter
+        Assert.Equal(new[] { 16933, 16931 }, set.Pieces);
+        Assert.Single(set.Bonuses);
+        Assert.Equal(3, set.Bonuses[0].Pieces);
+        Assert.StartsWith("Increases damage and healing", set.Bonuses[0].Text);
+    }
+
+    [Fact]
+    public void SetBlockStillDoesNotReachTheStatTable()
+    {
+        // The set bonus is +23 spell power; the glove's own Equip line is +20. Reading the block as
+        // stats would silently inflate every tier piece by its own set bonuses.
+        var item = ItemPageParser.Parse(NemesisGloves, 16928)!;
+
+        Assert.Equal(20, item.Stats["spellPower"]);
+    }
+
+    [Fact]
     public void ReturnsNullWhenThePageHasNoItemTooltip()
     {
         Assert.Null(ItemPageParser.Parse("<html><body>Not an item page</body></html>", 1));

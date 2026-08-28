@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using OctoBis.Scraper;
 
 /// <summary>Sources kept per item in the published data. Sorted most-accessible first.</summary>
@@ -242,6 +243,16 @@ if (ParseInt(args, "--inspect-item") is { } itemId)
     Console.WriteLine(parsed is null
         ? $"item {itemId}: tooltip not recognised"
         : $"item {itemId}: {parsed.Name} (q{parsed.Quality}) {parsed.SubClassName} slot={parsed.Slot} req={parsed.ReqLevel} randomSuffix={parsed.HasRandomSuffix}\n  stats: {string.Join(", ", parsed.Stats.Select(s => $"{s.Key}={s.Value}"))}\n  classes: {string.Join('/', parsed.Classes)}\n  set: {parsed.SetName}\n  unmatched: {string.Join(" | ", unmatched)}");
+    if (parsed is not null)
+    {
+        Console.WriteLine($"  tooltip: bind={parsed.Binding ?? "-"} unique={parsed.Unique} durability={parsed.Durability?.ToString() ?? "-"} bonusDmg={parsed.BonusDamage ?? "-"}");
+        foreach (var effect in parsed.Effects) Console.WriteLine($"    [{effect.Kind}] {effect.Text}");
+    }
+    if (ItemPageParser.ParseSet(html) is { } setInfo)
+    {
+        Console.WriteLine($"  set {setInfo.Id} '{setInfo.Name}' {setInfo.Pieces.Count}/{setInfo.Total} pieces: {string.Join(", ", setInfo.Pieces)}");
+        foreach (var bonus in setInfo.Bonuses) Console.WriteLine($"    ({bonus.Pieces}) {bonus.Text}");
+    }
     foreach (var view in ListviewParser.ParseAll(html))
         Console.WriteLine($"  listview id='{view.Id}' template='{view.Template}' rows={view.Rows.Count}");
     return 0;
@@ -321,6 +332,25 @@ var jsonOptions = new JsonSerializerOptions
 
 var ordered = items.OrderBy(i => i.Id).ToList();
 
+// Effect sentences repeat heavily across the database - the same "Increases damage and healing
+// done by magical spells and effects by up to 20" is on dozens of items - so they are written once
+// into a shared table and referenced by index. That is ~210 KB off the payload for 4,900 lines.
+var effectLine = new Regex(@"^(Equip|Use|Chance on hit):", RegexOptions.IgnoreCase);
+var effectTable = new List<ItemEffect>();
+var effectIndex = new Dictionary<(string Kind, string Text), int>();
+
+int EffectId(ItemEffect effect)
+{
+    var key = (effect.Kind, effect.Text);
+    if (effectIndex.TryGetValue(key, out var existing)) return existing;
+
+    effectIndex[key] = effectTable.Count;
+    effectTable.Add(effect);
+    return effectTable.Count - 1;
+}
+
+var effectRefs = ordered.ToDictionary(i => i.Id, i => i.Effects.Select(EffectId).ToList());
+
 await WriteJsonAsync(Path.Combine(dataDir, "items.json"), new
 {
     generated = DateTime.UtcNow.ToString("O"),
@@ -349,8 +379,32 @@ await WriteJsonAsync(Path.Combine(dataDir, "items.json"), new
         // from phase-gated views rather than assuming they are available now.
         minPhase = i.MinPhase == int.MaxValue ? (int?)null : i.MinPhase,
         stats = i.Stats.Count > 0 ? i.Stats.OrderBy(s => s.Key).ToDictionary(s => s.Key, s => Math.Round(s.Value, 2)) : null,
-        notes = i.Notes.Count > 0 ? i.Notes : null
-    })
+        // Effect lines are already carried verbatim in the shared table, so a note repeating one
+        // would be the same sentence twice. Notes keep only what nothing else records.
+        notes = i.Notes.Where(n => !effectLine.IsMatch(n)).ToList() is { Count: > 0 } kept ? kept : null,
+
+        // Tooltip presentation. Every one of these is null or absent when the item does not have
+        // it, so items with a bare stat line cost nothing extra in the payload.
+        bind = i.Binding,
+        unique = i.Unique ? true : (bool?)null,
+        dur = i.Durability,
+        bonusDmg = i.BonusDamage,
+        fx = effectRefs[i.Id] is { Count: > 0 } refs ? refs : null
+    }),
+    effects = effectTable.Select(e => new { k = e.Kind, t = e.Text }),
+    // Sets are written once and referenced by setId, rather than repeating the same piece list and
+    // bonus text on all eight members.
+    sets = crawler.Sets.Count > 0
+        ? crawler.Sets.OrderBy(kv => kv.Key).ToDictionary(
+            kv => kv.Key.ToString(),
+            kv => new
+            {
+                name = kv.Value.Name,
+                total = kv.Value.Total,
+                pieces = kv.Value.Pieces,
+                bonuses = kv.Value.Bonuses.OrderBy(b => b.Pieces).Select(b => new { n = b.Pieces, t = b.Text })
+            })
+        : null
 }, jsonOptions);
 
 await WriteJsonAsync(Path.Combine(dataDir, "sources.json"), new

@@ -73,16 +73,22 @@ export async function loadAll() {
   );
   const raw = Object.fromEntries(entries);
 
+  // Effect sentences are shared: the same wording appears on dozens of items, so the file stores
+  // each one once and items reference it by index. Resolved here so nothing downstream has to know.
+  const effectTable = raw.items.effects ?? [];
+
   const items = raw.items.items.map(item => {
     const type = normaliseType(item.subName);
+    const { fx, ...rest } = item;
     return {
-      ...item,
+      ...rest,
       type,
       // Items reached only through their own page carry no item class from a listview. Without one
       // the usability check would wave everything through, so infer it from the tooltip's type.
       cls: item.cls || inferItemClass(type),
       stats: item.stats ?? {},
-      classes: item.classes ?? []
+      classes: item.classes ?? [],
+      effects: (fx ?? []).map(i => effectTable[i]).filter(Boolean)
     };
   });
 
@@ -104,6 +110,7 @@ export async function loadAll() {
     iconExtension: raw.items.iconExtension ?? '.png',
     itemUrlBase: raw.items.itemUrlBase,
     sources: raw.sources.sources,
+    sets: raw.items.sets ?? {},
     zones: raw.zones.zones,
     meta: raw.meta,
     phases: raw.phases.phases,

@@ -35,6 +35,27 @@ public sealed class Item
     /// <summary>Effect lines the stat parser did not recognise, kept verbatim so nothing is lost.</summary>
     public List<string> Notes { get; set; } = new();
 
+    // ---- Tooltip presentation ----------------------------------------------------------------
+    //
+    // Scoring needs numbers; a tooltip needs the sentence the number came from. "Equip: Increases
+    // damage and healing done by magical spells and effects by up to 20" becomes spellPower=20 for
+    // the ranker, and a player reading the tooltip expects to see the sentence, not "+20 SP". These
+    // fields carry the parts of the tooltip that have no stat to become.
+
+    /// <summary>"pickup", "equip", "use" or "quest". Null when the item does not bind.</summary>
+    public string? Binding { get; set; }
+
+    public bool Unique { get; set; }
+
+    /// <summary>Maximum durability. Null for items that have none, such as rings and trinkets.</summary>
+    public int? Durability { get; set; }
+
+    /// <summary>Bonus weapon damage exactly as written, e.g. "+16 - 30 Nature Damage".</summary>
+    public string? BonusDamage { get; set; }
+
+    /// <summary>Equip / Use / Chance on hit lines in tooltip order, wording preserved.</summary>
+    public List<ItemEffect> Effects { get; set; } = new();
+
     /// <summary>Earliest phase in which any source of this item is available.</summary>
     public int MinPhase { get; set; } = int.MaxValue;
 
@@ -45,6 +66,42 @@ public sealed class Item
     [JsonIgnore] public bool HasRandomSuffix { get; set; }
 
     [JsonIgnore] public bool DetailFetched { get; set; }
+}
+
+/// <summary>One Equip / Use / Chance-on-hit line, kept as the tooltip words it.</summary>
+public sealed class ItemEffect
+{
+    /// <summary>"equip", "use" or "proc".</summary>
+    public string Kind { get; set; } = "";
+
+    public string Text { get; set; } = "";
+}
+
+/// <summary>
+/// A tier or dungeon set, stored once rather than repeated on every piece.
+///
+/// The piece list and bonus thresholds are identical for all eight members of a set, so writing
+/// them per item would multiply the same text by eight for no gain.
+/// </summary>
+public sealed class ItemSetInfo
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+
+    /// <summary>Piece ids in tooltip order, so the tooltip can list them and mark what you wear.</summary>
+    public List<int> Pieces { get; set; } = new();
+
+    /// <summary>Pieces in the complete set, as the tooltip states it ("(0/8)").</summary>
+    public int Total { get; set; }
+
+    public List<SetBonus> Bonuses { get; set; } = new();
+}
+
+/// <summary>A set bonus and the number of pieces that switches it on.</summary>
+public sealed class SetBonus
+{
+    public int Pieces { get; set; }
+    public string Text { get; set; } = "";
 }
 
 public enum SourceKind { Drop, Vendor, Quest, Craft, Object, Reputation }

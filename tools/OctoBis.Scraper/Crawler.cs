@@ -50,6 +50,9 @@ public sealed class Crawler
 
     private readonly Dictionary<int, Item> _items = new();
     private readonly Dictionary<int, List<ItemSource>> _sources = new();
+
+    /// <summary>Set blocks, read once from the first piece of each set that is detailed.</summary>
+    private readonly Dictionary<int, ItemSetInfo> _sets = new();
     private readonly Dictionary<int, Npc> _npcs = new();
     private readonly Dictionary<int, int> _zoneToPhase = new();
 
@@ -63,6 +66,9 @@ public sealed class Crawler
         _config = config;
         _zoneNames = zoneNames;
     }
+
+    /// <summary>Item sets encountered during the crawl, keyed by set id.</summary>
+    public IReadOnlyDictionary<int, ItemSetInfo> Sets => _sets;
 
     public async Task<(IReadOnlyCollection<Item> Items, Dictionary<int, List<ItemSource>> Sources, Report Report)> RunAsync(int? limit)
     {
@@ -500,6 +506,13 @@ public sealed class Crawler
 
         _items[id] = parsed;
         _report.ItemsDetailed++;
+
+        // All members of a set carry the same block, so the first one to arrive settles it.
+        if (parsed.SetId is int setId && !_sets.ContainsKey(setId)
+            && ItemPageParser.ParseSet(html) is { } setInfo)
+        {
+            _sets[setId] = setInfo;
+        }
 
         foreach (var view in ListviewParser.ParseAll(html))
         {

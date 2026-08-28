@@ -80,6 +80,29 @@ talents and once with every applicable hit talent maxed. Every set reaches its c
 never increase what gear has to find: they reduce it in 348 of the 384 builds that have any, and the
 36 that do not are cases where the winning items carry hit for free.
 
+### Tooltips
+
+Hovering an item shows the tooltip the game shows, in the game's order: name in its quality colour,
+binding, slot and type, weapon damage and speed, armour, stats, durability, class and level
+restrictions, then the green `Equip:` / `Use:` / `Chance on hit:` lines.
+
+Those green lines matter more than they look. The ranker turns "Equip: Increases damage and healing
+done by magical spells and effects by up to 20" into `spellPower: 20`, and a tooltip built from the
+parsed numbers alone would show `+20 SP` — losing the wording for every proc and on-use effect,
+which have no number at all. So the sentences are kept alongside the numbers and printed verbatim.
+Anything the stat parser could not read is printed too, so a tooltip never quietly omits part of an
+item.
+
+Set pieces get the full block: every piece in the set, the ones you are already wearing in white and
+the rest greyed out, and each bonus turning green as you reach its threshold. Below that — this part
+is not in a game tooltip — is where the item drops, since that is the question the site exists to
+answer.
+
+Effect sentences repeat heavily across the database, so `items.json` stores each distinct one once
+and items reference it by index; set blocks are stored once per set rather than on all eight pieces.
+Without that the file would be 1.5 MB instead of 1.1 MB. Gzipped, the whole tooltip feature costs
+about 22 KB on the wire.
+
 ### The Guide tab
 
 Hit is the one stat with a hard ceiling: below the cap it is usually a spec's best stat, and one
@@ -299,7 +322,8 @@ Please read these before treating any list as authoritative.
 - **Set bonuses are approximate.** They are modelled as a flat per-item score bonus, not as a true
   set-level optimisation, so tier breakpoints will be somewhat wrong until an override is added.
   Atlas's `Sets.lua` does not help here — despite the name it is a catalogue of item groupings, not
-  a table of set bonuses. The bonus text is parsed off the item tooltips but is not scored.
+  a table of set bonuses. The bonus text is parsed off the item tooltips and shown on hover, but it
+  is not scored.
 - **Race/class combinations are vanilla's.** OctoWoW states it opens up combinations beyond vanilla
   but does not publish them in a form worth guessing at, so `config/races.json` uses vanilla's plus
   the two added races. Correct that file if a combination is wrong — nothing else reads race data.
