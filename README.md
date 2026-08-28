@@ -332,9 +332,22 @@ Please read these before treating any list as authoritative.
 
 - **Set bonuses are approximate.** They are modelled as a flat per-item score bonus, not as a true
   set-level optimisation, so tier breakpoints will be somewhat wrong until an override is added.
-  Atlas's `Sets.lua` does not help here — despite the name it is a catalogue of item groupings, not
-  a table of set bonuses. The bonus text is parsed off the item tooltips and shown on hover, but it
-  is not scored.
+  The bonus text is parsed off the item tooltips and shown on hover, but it is not scored.
+- **280 tier pieces belong to no set the database knows about**, so they show no set block at all.
+  The database registers 88 item sets covering 514 pieces (its own `?itemsets` index is the
+  authority, and it is what these numbers come from). OctoWoW's per-spec tier variants are not among
+  them: Cenarion Regalia and Cenarion Harness exist in the game alongside vanilla's Cenarion
+  Raiment, but only Cenarion Raiment is a registered set. The same is true of Nemesis Attire,
+  Felheart Attire, Judgement Battleplate and the rest of the variant tier sets.
+
+  Nothing available states their bonuses. Not the database, and not Atlas — despite the name,
+  `Sets.lua` is a catalogue of item groupings with no bonus text anywhere in the addon. It is also
+  laid out for a two-column display, so the entries after a set's header are not all that set's:
+  Cenarion Regalia's last four pieces appear below Cenarion Harness's eight, separated by blank
+  rows. Deriving membership from it produces sets that are simply wrong, which is worse than
+  showing none.
+
+  Add them to `config/overrides.json` if you know the bonuses from in-game.
 - **Race/class combinations are vanilla's.** OctoWoW states it opens up combinations beyond vanilla
   but does not publish them in a form worth guessing at, so `config/races.json` uses vanilla's plus
   the two added races. Correct that file if a combination is wrong — nothing else reads race data.

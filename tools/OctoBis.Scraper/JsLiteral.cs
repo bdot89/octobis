@@ -200,11 +200,25 @@ public static class JsLiteral
     public static string? Str(Dictionary<string, object?> o, string key)
         => o.TryGetValue(key, out var v) && v is string s ? s : null;
 
+    /// <summary>
+    /// Numbers, whether or not the payload quoted them.
+    ///
+    /// The database is not consistent about this: a drop listview writes <c>id: 11981</c> while a
+    /// quest listview writes <c>id: '41409'</c>. Reading only unquoted numbers silently discarded
+    /// every quest reward in the database - 1,013 item pages, none of which produced a source.
+    /// </summary>
     public static double? Num(Dictionary<string, object?> o, string key)
-        => o.TryGetValue(key, out var v) && v is double d ? d : null;
+        => o.TryGetValue(key, out var v) ? AsNumber(v) : null;
 
     public static int? Int(Dictionary<string, object?> o, string key)
         => Num(o, key) is { } d ? (int)d : null;
+
+    private static double? AsNumber(object? value) => value switch
+    {
+        double d => d,
+        string s when double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) => parsed,
+        _ => null
+    };
 
     public static List<object?>? Arr(Dictionary<string, object?> o, string key)
         => o.TryGetValue(key, out var v) ? v as List<object?> : null;
@@ -213,7 +227,7 @@ public static class JsLiteral
     public static int? FirstInt(Dictionary<string, object?> o, string key)
     {
         foreach (var entry in Arr(o, key) ?? new List<object?>())
-            if (entry is double d) return (int)d;
+            if (AsNumber(entry) is { } d) return (int)d;
         return null;
     }
 }

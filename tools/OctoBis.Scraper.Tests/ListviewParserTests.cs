@@ -111,4 +111,33 @@ public class ListviewParserTests
         Assert.Equal("Nemesis Gloves", ListviewParser.StripNamePrefix(JsLiteral.Str(row, "name")!));
         Assert.DoesNotContain("quality", row.Keys);
     }
+    [Fact]
+    public void ReadsNumbersTheDatabaseWroteAsQuotedStrings()
+    {
+        // Drop listviews write `id: 11981`; quest listviews write `id: '41409'`. Accepting only the
+        // unquoted form discarded every quest reward in the database.
+        const string js = """
+            new Listview({template:'quest',id:'reward-of',data:[{id: '41409',name: 'Cenarion Shoulders',level: '60',reqlevel:60,itemchoices:[[47331,1],[47339,1]]}]});
+            """;
+
+        var view = ListviewParser.ParseAll(js).Single();
+        var row = view.Rows.Single();
+
+        Assert.Equal(41409, JsLiteral.Int(row, "id"));
+        Assert.Equal(60, JsLiteral.Int(row, "level"));
+        Assert.Equal(60, JsLiteral.Int(row, "reqlevel"));   // unquoted still works
+        Assert.Equal("Cenarion Shoulders", JsLiteral.Str(row, "name"));
+    }
+
+    [Fact]
+    public void QuotedNumbersDoNotTurnEveryStringIntoANumber()
+    {
+        const string js = "new Listview({template:'npc',id:'dropped-by',data:[{id:11981,name:'Flamegor',percent:6.67}]});";
+
+        var row = ListviewParser.ParseAll(js).Single().Rows.Single();
+
+        Assert.Null(JsLiteral.Int(row, "name"));
+        Assert.Equal("Flamegor", JsLiteral.Str(row, "name"));
+        Assert.Equal(6.67, JsLiteral.Num(row, "percent"));
+    }
 }
