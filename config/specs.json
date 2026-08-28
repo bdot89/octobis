@@ -123,17 +123,17 @@
       "specs": [
         {
           "id": "beastmastery", "name": "Beast Mastery", "role": "dps", "weaponStyle": "stats",
-          "weights": { "agi": 1.8, "str": 0.1, "sta": 0.1, "int": 0.12, "rap": 1.0, "ap": 0.35, "crit": 28, "hit": 33, "rangedDps": 16, "mp5": 1.5, "haste": 2 },
+          "weights": { "agi": 1.8, "str": 0.1, "sta": 0.1, "int": 0.12, "rap": 1.0, "ap": 0.35, "crit": 28, "hit": 33, "rangedDps": 16, "mp5": 0.4, "haste": 2 },
           "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "marksmanship", "name": "Marksmanship", "role": "dps", "weaponStyle": "stats",
-          "weights": { "agi": 1.85, "str": 0.1, "sta": 0.1, "int": 0.15, "rap": 1.0, "ap": 0.3, "crit": 30, "hit": 34, "rangedDps": 18, "mp5": 1.8, "haste": 2 },
+          "weights": { "agi": 1.85, "str": 0.1, "sta": 0.1, "int": 0.15, "rap": 1.0, "ap": 0.3, "crit": 30, "hit": 34, "rangedDps": 18, "mp5": 0.4, "haste": 2 },
           "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "survival", "name": "Survival", "role": "dps", "weaponStyle": "stats",
-          "weights": { "agi": 2.0, "str": 0.2, "sta": 0.15, "int": 0.12, "rap": 1.0, "ap": 0.4, "crit": 27, "hit": 33, "rangedDps": 15, "weaponDps": 1.5, "mp5": 1.5, "haste": 2 },
+          "weights": { "agi": 2.0, "str": 0.2, "sta": 0.15, "int": 0.12, "rap": 1.0, "ap": 0.4, "crit": 27, "hit": 33, "rangedDps": 15, "weaponDps": 1.5, "mp5": 0.4, "haste": 2 },
           "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         }
       ]
@@ -311,12 +311,12 @@
         },
         {
           "id": "feral", "name": "Feral (Cat)", "role": "dps", "weaponStyle": "stats",
-          "weights": { "str": 2.0, "agi": 1.9, "sta": 0.15, "ap": 1.0, "crit": 25, "hit": 33, "int": 0.05 },
+          "weights": { "str": 2.0, "agi": 1.9, "sta": 0.15, "ap": 1.0, "apFeral": 1.0, "crit": 25, "hit": 33, "int": 0.05 },
           "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
           "id": "guardian", "name": "Feral (Bear)", "role": "tank", "weaponStyle": "stats",
-          "weights": { "str": 1.0, "agi": 1.8, "sta": 3.2, "ap": 0.3, "armor": 0.22, "dodge": 30, "hit": 9, "crit": 7, "resFire": 0.4, "resNature": 0.3 }
+          "weights": { "str": 1.0, "agi": 1.8, "sta": 3.2, "ap": 0.3, "apFeral": 0.3, "armor": 0.22, "dodge": 30, "hit": 9, "crit": 7, "resFire": 0.4, "resNature": 0.3 }
         },
         {
           "id": "restoration", "name": "Restoration", "role": "healer", "school": "nature", "weaponStyle": "stats",

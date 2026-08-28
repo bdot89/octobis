@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-28T20:49:43.3326484Z",
+  "generated": "2026-08-28T22:16:02.4107706Z",
   "databaseUrl": "https://octowow.st/db/",
   "counts": {
     "items": 4047,
@@ -11,20 +11,20 @@
     "skippedAsWorldDrop": 1098,
     "abandonedSlowPages": 0,
     "retries": 0,
-    "cacheHits": 10144,
+    "cacheHits": 10146,
     "networkFetches": 0
   },
   "itemsPerPhase": {
-    "0": 2777,
+    "0": 2896,
     "1": 144,
     "2": 206,
     "3": 32,
-    "4": 305,
-    "6": 175,
+    "4": 307,
+    "6": 182,
     "7": 87,
-    "unknown": 321
+    "unknown": 193
   },
-  "itemsWithUnknownPhase": 483,
+  "itemsWithUnknownPhase": 355,
   "craftSourcesRephased": 66,
   "atlas": {
     "itemsFromAtlas": 7521,

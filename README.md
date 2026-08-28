@@ -273,6 +273,12 @@ Three things feed a phase, in order of trust:
 
 Two source kinds needed special handling, because both look launch-available and are not:
 
+- **Quest rewards** below epic quality are taken as available now: a quest ships with the build, and
+  the phases here are raid releases. The set fallback runs first, so tier pieces awarded by a quest
+  keep their raid's phase — the Cryptstalker set is a quest reward and stays in Naxxramas. Epic and
+  legendary quest rewards are excluded from the rule: they are endgame almost by definition, and
+  theirs are exactly the quests nothing can place. Without that cut, Atiesh became launch gear and
+  101 of the 224 class/spec/phase combinations equipped it.
 - **Crafted items** are only available when their recipe is, and recipe availability is not in the
   data. Where an item is both craftable and dropped, the drop decides: Yshgo'lar is listed as an
   Engineering craft but its only other source is C'Thun, so it is Ahn'Qiraj gear, not launch gear.
@@ -374,6 +380,12 @@ Please read these before treating any list as authoritative.
   guide's replacement advice reports a swap only when one actually comes out ahead.
 - **Proc and on-use effects are not scored at all.** They are captured as notes on the item and
   shown in the tooltip, but contribute nothing to the ranking unless given a bonus in the overrides.
+- **Conditional stats are carried but never scored.** Attack power that applies only in a druid form
+  or only against one creature type is not attack power you have. Both get their own stat key:
+  `apFeral`, which only the two feral specs weight, and `apVsTarget`, which nothing weights. Scored
+  as plain attack power they are ruinous — a hunter was handed Atiesh, a caster staff, for its
+  "+420 Attack Power in Cat, Bear, and Dire Bear forms only", and 24 further pieces of feral gear
+  were inflated the same way for every class that can wear leather.
 - **Relic slots come up empty** for Paladin, Shaman and Druid. Librams, totems and idols carry no
   stats at all — they modify abilities — so there is nothing for a stat-weight engine to rank. The
   slot says so rather than picking arbitrarily; give the good ones a bonus in `overrides.json` to

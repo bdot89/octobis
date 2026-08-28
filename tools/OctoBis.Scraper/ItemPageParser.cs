@@ -466,6 +466,15 @@ public static partial class ItemPageParser
         (new(@"Increases your ranged attack power by (?<v>\d+)", RegexOptions.IgnoreCase), "rap", 1),
         (new(@"Increases ranged attack power by (?<v>\d+)", RegexOptions.IgnoreCase), "rap", 1),
         (new(@"Increases attack power by (?<v>\d+)", RegexOptions.IgnoreCase), "ap", 1),
+        // Attack power that only applies to one creature type is not attack power you have. It
+        // is kept under a key no spec weights, so it still shows on the tooltip but never ranks an
+        // item - "+60 Attack Power when fighting Beasts" is worth nothing on a Naxxramas boss.
+        (new(@"\+(?<v>\d+) Attack Power when fighting", RegexOptions.IgnoreCase), "apVsTarget", 1),
+        // Feral druid gear states its attack power as form-conditional. Scored as plain attack
+        // power it is worth a fortune to every class that can wear leather - a hunter was handed
+        // Atiesh for its "+420 Attack Power in Cat, Bear, and Dire Bear forms only". It gets its own
+        // key so only the specs that actually fight in a form weight it.
+        (new(@"\+(?<v>\d+) Attack Power in [^.]*forms? only", RegexOptions.IgnoreCase), "apFeral", 1),
         (new(@"\+(?<v>\d+) Attack Power", RegexOptions.IgnoreCase), "ap", 1),
         (new(@"Restores (?<v>\d+) mana per 5 sec", RegexOptions.IgnoreCase), "mp5", 1),
         // Health regeneration is recognised so it stops showing up as an unmatched line; no spec

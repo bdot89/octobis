@@ -261,7 +261,7 @@ const SUMMARY_GROUPS = [
       ['healPower', 'Healing Power'], ['crit', 'Crit %'], ['hit', 'Hit %'],
       ['spellCrit', 'Spell Crit %'], ['spellHit', 'Spell Hit %'], ['haste', 'Attack Speed %'],
       ['armorPen', 'Armor Penetration'], ['spellPen', 'Spell Penetration'],
-      ['flatMeleeDamage', 'Bonus Weapon Damage'],
+      ['flatMeleeDamage', 'Bonus Weapon Damage'], ['apFeral', 'Attack Power (Cat/Bear forms)'], ['apVsTarget', 'Attack Power (vs creature type)'],
       ['spellDmgArcane', 'Arcane Damage'], ['spellDmgFire', 'Fire Damage'],
       ['spellDmgFrost', 'Frost Damage'], ['spellDmgHoly', 'Holy Damage'],
       ['spellDmgNature', 'Nature Damage'], ['spellDmgShadow', 'Shadow Damage']

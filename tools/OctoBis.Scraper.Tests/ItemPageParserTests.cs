@@ -228,6 +228,34 @@ public class ItemPageParserTests
     }
 
     [Fact]
+    public void FormConditionalAttackPowerIsNotPlainAttackPower()
+    {
+        // Atiesh states "+420 Attack Power in Cat, Bear, and Dire Bear forms only". Read as plain
+        // attack power it made a caster staff the best main hand in the game for a hunter.
+        const string html = """
+            <td><table><tr><td><b class="q5">Atiesh, Greatstaff of the Guardian</b><table width="100%"><tr><td>Two-hand</td><th>Staff</th></tr></table>+28 Stamina<br /></td></tr></table><table><tr><td><span class="q2">Equip: <a href="?spell=1">+420 Attack Power in Cat, Bear, and Dire Bear forms only.</a></span><br /></td></tr></table>
+            """;
+
+        var item = ItemPageParser.Parse(html, 22632)!;
+
+        Assert.False(item.Stats.ContainsKey("ap"));
+        Assert.Equal(420, item.Stats["apFeral"]);
+    }
+
+    [Fact]
+    public void UnconditionalAttackPowerIsStillPlainAttackPower()
+    {
+        const string html = """
+            <td><table><tr><td><b class="q4">Test Cloak</b><table width="100%"><tr><td>Back</td><th>Cloth</th></tr></table></td></tr></table><table><tr><td><span class="q2">Equip: <a href="?spell=1">+16 Attack Power.</a></span><br /></td></tr></table>
+            """;
+
+        var item = ItemPageParser.Parse(html, 1)!;
+
+        Assert.Equal(16, item.Stats["ap"]);
+        Assert.False(item.Stats.ContainsKey("apFeral"));
+    }
+
+    [Fact]
     public void ReturnsNullWhenThePageHasNoItemTooltip()
     {
         Assert.Null(ItemPageParser.Parse("<html><body>Not an item page</body></html>", 1));

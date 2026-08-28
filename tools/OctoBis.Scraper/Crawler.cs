@@ -530,7 +530,13 @@ public sealed class Crawler
 
                 // An item page reports the dropping NPC but often no zone. Fall back to whatever we
                 // already know about that NPC from seeding.
-                var known = _npcs.GetValueOrDefault(sourceId.Value);
+                // Only for NPC-backed sources. Quest and object ids live in their own id spaces, so
+                // a quest id that happens to equal an NPC id would inherit that NPC's zone and phase
+                // - which is how the Cryptstalker quest was placed in Blackrock Depths, and with it
+                // the whole of hunter tier 3 into the launch planner.
+                var known = kind is SourceKind.Drop or SourceKind.Vendor
+                    ? _npcs.GetValueOrDefault(sourceId.Value)
+                    : null;
                 if (zoneId == 0 && known is not null) zoneId = known.ZoneId;
 
                 AddSource(id, new ItemSource
@@ -653,8 +659,31 @@ public sealed class Crawler
         foreach (var item in _items.Values)
         {
             if (item.MinPhase != int.MaxValue) continue;
-            if (_setPhases.TryGetValue(item.Id, out var setPhase)) item.MinPhase = setPhase;
-            else _report.ItemsWithUnknownPhase++;
+
+            if (_setPhases.TryGetValue(item.Id, out var setPhase))
+            {
+                item.MinPhase = setPhase;
+                continue;
+            }
+
+            // A quest reward that neither a zone nor a set can place is taken as available now:
+            // quests ship with the build, and the phases here are raid releases, not quest releases.
+            //
+            // Below epic quality only. Epic and legendary quest rewards are endgame almost by
+            // definition and their quests are the ones this cannot place - Atiesh, Thunderfury, the
+            // Blessed Qiraji weapons, the Shifting Sands jewellery. Letting the rule reach them put
+            // a Naxxramas legendary in the launch planner and had 101 class/spec/phase combinations
+            // equipping it. They stay unknown until something can phase them properly.
+            if (item.Quality < 4
+                && _sources.TryGetValue(item.Id, out var itemSources)
+                && itemSources.Any(s => s.Kind == SourceKind.Quest))
+            {
+                item.MinPhase = 0;
+                _report.QuestRewardsPhasedAtLaunch++;
+                continue;
+            }
+
+            _report.ItemsWithUnknownPhase++;
         }
     }
 
@@ -823,6 +852,9 @@ public sealed class Report
     public int AtlasContainerItems { get; set; }
     public int QuestItems { get; set; }
     public int ItemsWithUnknownPhase { get; set; }
+
+    /// <summary>Quest rewards no zone or set could place, taken as available now.</summary>
+    public int QuestRewardsPhasedAtLaunch { get; set; }
     public int CraftSourcesRephased { get; set; }
 
     /// <summary>Instance -> count of items Atlas lists that the database has no entry for.</summary>
