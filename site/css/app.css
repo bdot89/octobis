@@ -320,7 +320,16 @@ a:hover { text-decoration: underline; }
   font-size: 0.86rem;
 }
 .stat-group dt { color: var(--text-muted); }
-.stat-group dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; }
+.stat-group dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
+
+/* Where a stat is not all gear - talent hit, most often - the split is spelled out under it. */
+.stat-breakdown {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
 
 .panel-note { margin: 1rem 0 0; font-size: 0.78rem; color: var(--text-muted); }
 

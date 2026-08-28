@@ -7,7 +7,7 @@ import { buildBis } from './score.js';
 import { candidatesFor, normalise, autoFill } from './equipped.js';
 import { renderTalents, addPoint, removePoint, treesFor } from './talents.js';
 import { renderGuide } from './guide.js';
-import { hitProfile } from './hit.js';
+import { hitProfile, talentHit, hitKindFor } from './hit.js';
 import { forSlot as enchantsForSlot, appliedStats, find as findEnchant } from './enchants.js';
 import { slotByKey, siblingSlots, isTwoHanded } from './slots.js';
 import { attachTooltips } from './tooltip.js';
@@ -43,6 +43,22 @@ function overridesOf(character) {
   return overridesFor(data, character.classId, character.specId, phaseId);
 }
 
+/**
+ * Stats the talent build grants outright, for folding into the character totals.
+ *
+ * Only hit for now, because it is the only talent effect the config quantifies - and the only one
+ * the planner would otherwise report wrongly. A Shadow priest with 5/5 Shadow Focus has 10% spell
+ * hit before equipping anything, so a totals panel that counts gear alone tells them they are 10%
+ * further from the cap than they really are, and the number it shows is not their character's.
+ */
+function talentStatsFor(character, spec) {
+  const contributed = talentHit(
+    data.hitcaps, data.talents, character.classId, spec, Characters.talentsFor(character));
+
+  if (!contributed.total) return {};
+  return { [hitKindFor(spec) === 'spell' ? 'spellHit' : 'hit']: contributed.total };
+}
+
 // ---- Rendering -------------------------------------------------------------------------------
 
 function render() {
@@ -63,7 +79,7 @@ function render() {
     const enchants = Characters.enchantsFor(character, phaseId);
     view.innerHTML = renderPlanner(
       data, character, cls, spec, phaseOf(), Characters.gearFor(character, phaseId), overrides,
-      enchants, appliedStats(data.enchantIndex, enchants));
+      enchants, appliedStats(data.enchantIndex, enchants), talentStatsFor(character, spec));
     return;
   }
 

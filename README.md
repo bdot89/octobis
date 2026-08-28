@@ -21,7 +21,10 @@ tools/OctoBis.Serve     static file server for local preview
 Create a character (name, class, spec, race — up to eight, saved in your browser), pick a phase from
 the Database dropdown, then click any equipment slot to see every item that fits it, ranked best to
 worst with a 0–100 score and the boss, vendor or recipe it comes from. **Auto-fill best in slot**
-equips the whole set at once.
+equips the whole set at once, and gears to the hit cap for whatever the loadout fights — bosses for
+PvE, players for PvP — counting your talents first, so a Shadow priest with 5/5 Shadow Focus is sent
+looking for 6% from gear rather than the full 16%. Change the talents and auto-fill again and the
+set changes with them.
 
 Every character keeps **two completely separate loadouts, PvE and PvP**, each with its own gear and
 its own talent build. Both appear under the character in the dropdown, and the PvE/PvP toggle in the
@@ -53,6 +56,29 @@ a wide margin, which is exactly the trap the item rankings already avoid.
 Weapon and shield enchants filter themselves to what you are holding — a shield enchant only shows
 if there is a shield in your off hand, and a two-hander is offered two-handed enchants only.
 `config/enchants.json` is an override layer for correcting individual entries.
+
+### How auto-fill handles hit
+
+Hit cannot be ranked like an ordinary stat. It is a requirement with a hard ceiling: below the cap
+you are missing attacks outright, above it every point is dead. A weight high enough to reach the cap
+overvalues hit in every other slot, and a weight low enough to be fair leaves the set short. So the
+cap is treated as a constraint and the set is built in three passes:
+
+1. **Greedy** — the best item per slot, with hit past the cap valued at nothing.
+2. **Gap pass** — buy the hit still missing, cheapest first, ranked by score given up per point of
+   hit gained. Hit beyond the cap is not what is being bought and does not count towards the trade.
+3. **Refine** — re-optimise every slot knowing the whole set, forbidden from dropping below the hit
+   the gap pass secured.
+
+Talents and enchants are counted before a single item is chosen, so the gear only shops for the
+remainder. Where the cap cannot be reached at all — 16% spell hit does not exist in Launch-phase
+gear — the second pass reports what it actually managed, and the third optimises around that instead
+of throwing away good gear chasing a number that is not there.
+
+Verified across all 448 class/spec/phase/loadout combinations, each built twice — once with no
+talents and once with every applicable hit talent maxed. Every set reaches its cap, and hit talents
+never increase what gear has to find: they reduce it in 348 of the 384 builds that have any, and the
+36 that do not are cases where the winning items carry hit for free.
 
 ### The Guide tab
 
@@ -293,8 +319,10 @@ Please read these before treating any list as authoritative.
 - **Crafting skill levels are not shown.** Atlas records four numbers per recipe whose meaning is
   not documented and does not read consistently as "skill required", so only the profession is
   displayed. The numbers are still parsed if someone works out what they are.
-- **Hit and spell-hit caps are applied per item, not per set.** An item's hit is scored against the
-  cap in isolation, which slightly overvalues hit once you are already capped.
+- **Auto-fill can still land over the hit cap** when the best gear carries hit regardless. A Naxxramas
+  rogue with 5/5 Precision needs 4% from gear but every Bonescythe piece has 1% on it, and each still
+  wins its slot with that hit valued at zero. The surplus is real, not the ranker chasing hit; the
+  guide's replacement advice reports a swap only when one actually comes out ahead.
 - **Proc and on-use effects are not scored at all.** They are captured as notes on the item and
   shown in the tooltip, but contribute nothing to the ranking unless given a bonus in the overrides.
 - **Relic slots come up empty** for Paladin, Shaman and Druid. Librams, totems and idols carry no

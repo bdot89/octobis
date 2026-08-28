@@ -50,8 +50,8 @@ function slotCell(data, slot, gear, side, enchants) {
     </div>`;
 }
 
-function summaryPanel(data, character, cls, spec, phase, gear, overrides, enchantStats) {
-  const summary = summarise(data, gear, spec, overrides, enchantStats);
+function summaryPanel(data, character, cls, spec, phase, gear, overrides, enchantStats, talentStats) {
+  const summary = summarise(data, gear, spec, overrides, enchantStats, talentStats);
   const filled = summary.equippedCount;
   const total = LEFT_SLOTS.length + RIGHT_SLOTS.length;
 
@@ -76,31 +76,38 @@ function summaryPanel(data, character, cls, spec, phase, gear, overrides, enchan
         <span class="fill-count">${filled} / ${total} slots</span>
       </div>
 
-      ${summary.groups.length === 0
+      ${filled === 0
         ? '<p class="empty">Nothing equipped yet. Click a slot to browse its ranked options, or auto-fill the whole set.</p>'
-        : `<div class="stat-groups">
+        : ''}
+
+      ${summary.groups.length === 0 ? '' : `<div class="stat-groups">
             ${summary.groups.map(group => `
               <section class="stat-group">
                 <h3>${esc(group.name)}</h3>
                 <dl>
                   ${group.entries.map(entry => `
-                    <div><dt>${esc(entry.label)}</dt><dd>${entry.value}</dd></div>`).join('')}
+                    <div>
+                      <dt>${esc(entry.label)}</dt>
+                      <dd>${entry.value}${entry.breakdown
+                        ? `<span class="stat-breakdown">${esc(entry.breakdown)}</span>` : ''}</dd>
+                    </div>`).join('')}
                 </dl>
               </section>`).join('')}
            </div>`}
 
       <p class="panel-note">
-        Totals come from equipped gear only — base class and race values are not in the dataset,
-        so a combined health or mana figure would be mostly invention.
+        Totals cover gear, enchants and any talent that grants a stat outright — Shadow Focus and
+        the like are part of your hit, so they are counted here. Base class and race values are not
+        in the dataset, so a combined health or mana figure would be mostly invention.
       </p>
     </div>`;
 }
 
-export function renderPlanner(data, character, cls, spec, phase, gear, overrides, enchants = {}, enchantStats = {}) {
+export function renderPlanner(data, character, cls, spec, phase, gear, overrides, enchants = {}, enchantStats = {}, talentStats = {}) {
   return `
     <div class="planner">
       <div class="slot-column">${LEFT_SLOTS.map(s => slotCell(data, s, gear, 'left', enchants)).join('')}</div>
-      <div class="planner-centre">${summaryPanel(data, character, cls, spec, phase, gear, overrides, enchantStats)}</div>
+      <div class="planner-centre">${summaryPanel(data, character, cls, spec, phase, gear, overrides, enchantStats, talentStats)}</div>
       <div class="slot-column">${RIGHT_SLOTS.map(s => slotCell(data, s, gear, 'right', enchants)).join('')}</div>
     </div>`;
 }
