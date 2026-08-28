@@ -57,6 +57,17 @@ Weapon and shield enchants filter themselves to what you are holding — a shiel
 if there is a shield in your off hand, and a two-hander is offered two-handed enchants only.
 `config/enchants.json` is an override layer for correcting individual entries.
 
+Enchant values are read from the database's own wording, which is its own dialect and a fragmented
+one: vanilla says the same thing a dozen ways — "give 7 Agility", "adds 8 agility", "grant +4 to all
+stats", "increase Spell Power by 3" — and each phrasing needs its own pattern. A phrasing with no
+pattern behind it does not fail loudly; it produces an enchant worth nothing, which looks exactly
+like an enchant you chose badly. Every wording that appears in the data is covered by a test, and
+the run prints how many effects it could not read.
+
+Patterns accumulate, so two that match one sentence both add their value. That doubled three armour
+enchants once, and one of the culprits was a bare-number rule matching the "25" inside "125 armor".
+The overlap-prone sentences are pinned by tests of their own.
+
 ### How auto-fill handles hit
 
 Hit cannot be ranked like an ordinary stat. It is a requirement with a hard ceiling: below the cap
@@ -336,10 +347,11 @@ Please read these before treating any list as authoritative.
   stack past 305 in vanilla; values above the top entry fall off at a flat rate rather than being
   modelled properly. The dual-wield white-hit cap is reported for information only, since gear
   cannot reach it.
-- **Enchant values are curated, not scraped.** The enchant *list* is imported in full, but what each
-  one is worth comes from `config/enchants.json`. Anything unlisted is applied and shown but not
-  counted — it says so rather than quietly scoring zero. Proc enchants (Crusader, Fiery Weapon) are
-  deliberately unscored for the same reason procs on items are.
+- **96 of 265 attachments carry no stats**, and each is deliberate: flat health and mana pools (no
+  base values here to add them to), profession skills, movement speed, threat, procs (Crusader,
+  Fiery Weapon — unscored for the same reason procs on items are), and damage conditional on the
+  target's type. They are applied and shown, labelled as contributing nothing rather than quietly
+  scoring zero. `config/enchants.json` can give any of them a value.
 - **Crafting skill levels are not shown.** Atlas records four numbers per recipe whose meaning is
   not documented and does not read consistently as "skill required", so only the profession is
   displayed. The numbers are still parsed if someone works out what they are.

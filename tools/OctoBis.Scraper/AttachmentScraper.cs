@@ -187,16 +187,40 @@ public sealed partial class AttachmentScraper
         attachment.Effect = effect;
         if (effect is null) return;
 
-        // A proc is not a stat. Crusader reads "increase Strength by 100 for 15 sec", and taking
-        // that at face value would rank it as the best enchant in the game by a wide margin.
-        // Conditional and timed effects are recorded but deliberately left unscored, the same way
-        // proc effects on items are.
-        if (ProcRegex().IsMatch(effect))
+        var result = ParseEffect(effect);
+
+        if (result.IsProc)
         {
             attachment.IsProc = true;
             Unparsed.Add($"{attachment.Name} (proc, not scored): {effect}");
             return;
         }
+
+        foreach (var (key, value) in result.Stats) attachment.Stats[key] = value;
+        if (!result.Understood) Unparsed.Add($"{attachment.Name}: {effect}");
+    }
+
+    /// <summary>The outcome of reading one effect sentence.</summary>
+    /// <param name="Stats">Stats the sentence grants; empty when it grants none this site models.</param>
+    /// <param name="IsProc">The effect is timed or conditional, so deliberately not scored.</param>
+    /// <param name="Understood">A pattern recognised the sentence, even if it produced no stat.</param>
+    public readonly record struct EffectResult(
+        Dictionary<string, double> Stats, bool IsProc, bool Understood);
+
+    /// <summary>
+    /// Reads one enchant description. Public so the wordings can be tested directly: vanilla says
+    /// the same thing a dozen ways - "give 7 Agility", "adds 8 agility", "grant +4 to all stats" -
+    /// and any phrasing without a pattern silently yields an enchant worth nothing.
+    /// </summary>
+    public static EffectResult ParseEffect(string effect)
+    {
+        var stats = new Dictionary<string, double>();
+
+        // A proc is not a stat. Crusader reads "increase Strength by 100 for 15 sec", and taking
+        // that at face value would rank it as the best enchant in the game by a wide margin.
+        // Conditional and timed effects are recorded but deliberately left unscored, the same way
+        // proc effects on items are.
+        if (ProcRegex().IsMatch(effect)) return new EffectResult(stats, true, true);
 
         var matched = false;
 
@@ -212,16 +236,33 @@ public sealed partial class AttachmentScraper
                 if (key == "resAll")
                 {
                     foreach (var school in new[] { "resFire", "resFrost", "resNature", "resShadow", "resArcane" })
-                        attachment.Stats[school] = attachment.Stats.GetValueOrDefault(school) + value;
+                        stats[school] = stats.GetValueOrDefault(school) + value;
                     continue;
                 }
 
                 if (key == "statWord")
                 {
                     var resolved = StatWords.GetValueOrDefault(match.Groups["stat"].Value.ToLowerInvariant());
-                    if (resolved is not null) attachment.Stats[resolved] = attachment.Stats.GetValueOrDefault(resolved) + value;
+                    if (resolved is not null) stats[resolved] = stats.GetValueOrDefault(resolved) + value;
                     // Health and mana are real effects but not stats this site models, so a match
                     // that resolves to nothing still counts as understood rather than unparsed.
+                    continue;
+                }
+
+                if (key == "allStats")
+                {
+                    foreach (var stat in new[] { "str", "agi", "sta", "int", "spi" })
+                        stats[stat] = stats.GetValueOrDefault(stat) + value;
+                    continue;
+                }
+
+                // "+20 shadow damage" is not spell power - it only helps a caster of that school,
+                // which is exactly how the item parser stores it, so enchants use the same keys.
+                if (key == "spellSchool")
+                {
+                    var school = match.Groups["school"].Value.ToLowerInvariant();
+                    var resolved = "spellDmg" + char.ToUpperInvariant(school[0]) + school[1..];
+                    stats[resolved] = stats.GetValueOrDefault(resolved) + value;
                     continue;
                 }
 
@@ -233,15 +274,15 @@ public sealed partial class AttachmentScraper
                         "fire" => "resFire", "frost" => "resFrost", "nature" => "resNature",
                         "shadow" => "resShadow", "arcane" => "resArcane", _ => null
                     };
-                    if (resolved is not null) attachment.Stats[resolved] = attachment.Stats.GetValueOrDefault(resolved) + value;
+                    if (resolved is not null) stats[resolved] = stats.GetValueOrDefault(resolved) + value;
                     continue;
                 }
 
-                attachment.Stats[key] = attachment.Stats.GetValueOrDefault(key) + value;
+                stats[key] = stats.GetValueOrDefault(key) + value;
             }
         }
 
-        if (!matched) Unparsed.Add($"{attachment.Name}: {effect}");
+        return new EffectResult(stats, false, matched);
     }
 
     /// <summary>
@@ -263,7 +304,12 @@ public sealed partial class AttachmentScraper
         ["nature resistance"] = "resNature", ["shadow resistance"] = "resShadow",
         ["arcane resistance"] = "resArcane", ["all resistances"] = "resAll",
         ["resistances"] = "resAll", ["defense rating"] = "defense",
-        ["hit"] = "hit", ["critical strike"] = "crit"
+        ["hit"] = "hit", ["critical strike"] = "crit",
+        ["haste"] = "haste", ["parry"] = "parry", ["block"] = "block",
+        ["ranged attack power"] = "rap", ["armor penetration"] = "armorPen",
+        ["spell penetration"] = "spellPen", ["vampirism"] = "leech",
+        // Flat pools, like health and mana: nothing to add them to.
+        ["hit points"] = null, ["chance to hit"] = "hit"
     };
 
     private static readonly (Regex Pattern, string Key)[] Patterns =
@@ -289,18 +335,84 @@ public sealed partial class AttachmentScraper
         (new(@"(?:increase|increases) (?:your )?intellect by (?<v>\d+)", RegexOptions.IgnoreCase), "int"),
         (new(@"(?:increase|increases) (?:your )?spirit by (?<v>\d+)", RegexOptions.IgnoreCase), "spi"),
         (new(@"(?:increase|increases) (?:your )?defense(?: rating)? by (?<v>\d+)", RegexOptions.IgnoreCase), "defense"),
-        (new(@"(?:increase|increases) (?:your )?armor by (?<v>\d+)", RegexOptions.IgnoreCase), "armor"),
-        (new(@"(?<v>\d+) (?:additional )?armor", RegexOptions.IgnoreCase), "armor"),
+        (new(@"(?:increase|increases) (?:your |its )?armor by (?<v>\d+)", RegexOptions.IgnoreCase), "armor"),
+        // Both guards earn their place: without \b this matched the "25" inside "125 armor",
+        // and without the lookbehind it claimed a value the "adds N <stat>" pattern already read.
+        (new(@"(?<!adds )\b(?<v>\d+) (?:additional )?armor", RegexOptions.IgnoreCase), "armor"),
         (new(@"all (?:your )?(?:magical )?resistances by (?<v>\d+)", RegexOptions.IgnoreCase), "resAll"),
         (new(@"magical resistances by (?<v>\d+)", RegexOptions.IgnoreCase), "resAll"),
         (new(@"(?<school>fire|frost|nature|shadow|arcane) resistance by (?<v>\d+)", RegexOptions.IgnoreCase), "school"),
-        (new(@"chance to hit(?: with spells)? by (?<v>[\d.]+)%", RegexOptions.IgnoreCase), "hit"),
+        (new(@"chance to hit with spells by (?<v>[\d.]+)%", RegexOptions.IgnoreCase), "spellHit"),
+        (new(@"chance to hit by (?<v>[\d.]+)%", RegexOptions.IgnoreCase), "hit"),
         (new(@"critical strike[^.]{0,30}by (?<v>[\d.]+)%", RegexOptions.IgnoreCase), "crit"),
         (new(@"(?:restore|restores|regenerate) (?<v>\d+) mana per 5", RegexOptions.IgnoreCase), "mp5"),
         (new(@"(?:increase|increases) (?:your )?dodge[^.]{0,20}by (?<v>[\d.]+)%", RegexOptions.IgnoreCase), "dodge"),
         (new(@"block value[^.]{0,20}by (?<v>\d+)", RegexOptions.IgnoreCase), "blockValue"),
         (new(@"(?:increase|increases) (?:your )?healing (?:power )?by (?:up to )?(?<v>\d+)", RegexOptions.IgnoreCase), "healPower"),
-        (new(@"spell damage[^.]{0,20}by (?:up to )?(?<v>\d+)", RegexOptions.IgnoreCase), "spellPower")
+        (new(@"spell damage[^.]{0,20}by (?:up to )?(?<v>\d+)", RegexOptions.IgnoreCase), "spellPower"),
+
+        // ---- Wordings the first pass missed -----------------------------------------------
+        //
+        // Everything below was found by listing the enchants that came back with no stats at all
+        // and reading their own descriptions. Vanilla words the same effect a dozen ways -
+        // "give 7 Agility", "adds 8 agility", "grant +4 to all stats" - and each phrasing that has
+        // no pattern silently produces an enchant worth nothing.
+
+        // "give 7 Agility", "give 15 fire resistance", "give 3 Stamina". No "by", so none of the
+        // "... by N" patterns above can reach these.
+        (new(@"(?:give|gives) (?<v>\d+) (?<stat>[A-Za-z][A-Za-z ]{1,22}?)(?:\.|,|$)", RegexOptions.IgnoreCase), "statWord"),
+        (new(@"(?:give|gives|grant|grants) (?<v>\d+) to all resistances", RegexOptions.IgnoreCase), "resAll"),
+
+        // Head and leg enchants, and the Zandalar shoulder signets: "Permanently adds N <stat>".
+        (new(@"adds\s+\+?(?<v>\d+)\s+(?<stat>[A-Za-z][A-Za-z ]{1,22}?)(?=\s*(?:,|\.|$)|\s+and\s|\s+to\s+a\s)", RegexOptions.IgnoreCase), "statWord"),
+        // Continuations of the same list: "adds 24 Ranged Attack Power, 10 Stamina, and 1% ...".
+        // Only the first entry follows the word "adds", so the rest need their own pattern.
+        (new(@",\s*(?<v>\d+)\s+(?<stat>[A-Za-z][A-Za-z ]{1,22}?)(?=\s*(?:,|\.|$)|\s+and\s|\s+to\s+a\s)", RegexOptions.IgnoreCase), "statWord"),
+                (new(@"adds\s+\+?(?<v>[\d.]+)% (?<stat>dodge|haste|parry|block)", RegexOptions.IgnoreCase), "statWord"),
+        // "Permanently adds +8 to your Healing and Damage from spells"
+        (new(@"adds\s+\+?(?<v>\d+) to your healing and damage from spells", RegexOptions.IgnoreCase), "spellPower"),
+        // "Permanently adds 18 to all healing and damage spells"
+        (new(@"adds\s+\+?(?<v>\d+) to all healing and damage spells", RegexOptions.IgnoreCase), "spellPower"),
+        // Zandalar Signet of Mojo says "effects up to 18" - no "by", so the pattern above misses it.
+        (new(@"damage and healing done by magical spells and effects up to (?<v>\d+)", RegexOptions.IgnoreCase), "spellPower"),
+        (new(@"healing done by spells and effects up to (?<v>\d+)", RegexOptions.IgnoreCase), "healPower"),
+
+        // School-specific spell damage: the Power glove enchants, the caster gemstones, and the
+        // two-handed weapon enchants.
+        (new(@"(?<school>fire|frost|nature|shadow|arcane|holy) damage by (?:up to )?(?<v>\d+)", RegexOptions.IgnoreCase), "spellSchool"),
+        (new(@"up to (?<v>\d+) additional (?<school>fire|frost|nature|shadow|arcane|holy) damage when casting", RegexOptions.IgnoreCase), "spellSchool"),
+
+        (new(@"(?:increase|increases) spell power by (?<v>\d+)", RegexOptions.IgnoreCase), "spellPower"),
+        (new(@"(?:increase|increases) (?:the caster's healing spells|the effects of your healing spells) by (?:up to )?(?<v>\d+)", RegexOptions.IgnoreCase), "healPower"),
+
+        // "+4 to all stats", "increase All stats by 3".
+        (new(@"(?:grant|grants|give|gives) \+?(?<v>\d+) to all stats", RegexOptions.IgnoreCase), "allStats"),
+        (new(@"(?:increase|increases) all stats by (?<v>\d+)", RegexOptions.IgnoreCase), "allStats"),
+
+        (new(@"(?:increase|increases) (?:your )?defense skill by (?<v>\d+)", RegexOptions.IgnoreCase), "defense"),
+        (new(@"(?:increase|increases) (?:your )?armor penetration by (?<v>\d+)", RegexOptions.IgnoreCase), "armorPen"),
+        (new(@"(?:increase|increases) (?:your )?vampirism by (?<v>[\d.]+)%", RegexOptions.IgnoreCase), "leech"),
+        (new(@"(?:increase|increases) block chance by (?<v>[\d.]+)%", RegexOptions.IgnoreCase), "block"),
+        (new(@"(?:give|gives|grant|grants) \+?(?<v>[\d.]+)% chance to block", RegexOptions.IgnoreCase), "block"),
+        (new(@"(?:give|gives|grant|grants) a (?<v>[\d.]+)% chance to dodge", RegexOptions.IgnoreCase), "dodge"),
+        (new(@"(?:increase|increases) (?:your )?arcane magic resistance by (?<v>\d+)", RegexOptions.IgnoreCase), "resArcane"),
+        (new(@"(?:increase|increases) spell penetration by (?<v>\d+)", RegexOptions.IgnoreCase), "spellPen"),
+        // "decreases the magical resistances of your spell targets by 10" - reducing the target's
+        // resistance is spell penetration, not resistance of your own.
+        (new(@"magical resistances of your spell targets by (?<v>\d+)", RegexOptions.IgnoreCase), "spellPen"),
+        (new(@"(?:increase|increases) mana regeneration by (?<v>\d+) every 5", RegexOptions.IgnoreCase), "mp5"),
+        (new(@"(?:restore|restores|regenerate) (?<v>\d+) mana every 5", RegexOptions.IgnoreCase), "mp5"),
+        (new(@"\+?(?<v>[\d.]+)% attack speed", RegexOptions.IgnoreCase), "haste"),
+
+        // Spell hit and melee hit read almost identically and must not be conflated: an enchant
+        // giving spell hit does nothing for a warrior's cap.
+        (new(@"(?<v>[\d.]+)% chance to hit with spells", RegexOptions.IgnoreCase), "spellHit"),
+        (new(@"(?<v>[\d.]+)% chance to hit(?! with spells)", RegexOptions.IgnoreCase), "hit"),
+
+        // "do 3 additional points of damage" on a weapon. Captured with the same key items use for
+        // flat weapon damage, which is carried but not scored - it depends on weapon speed, and an
+        // enchant does not know what it will be applied to.
+        (new(@"do \+?(?<v>\d+) (?:additional points? of )?damage(?!\s+(?:to|against))", RegexOptions.IgnoreCase), "flatMeleeDamage")
     };
 
     /// <summary>
