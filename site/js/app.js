@@ -285,6 +285,11 @@ function openPicker(slotKey) {
   document.getElementById('picker-search').focus();
 }
 
+/** Items with no stats at all cannot be scored: relics, and trinkets that are pure proc. */
+function hasScoreableStats(item) {
+  return Object.keys(item.stats ?? {}).length > 0;
+}
+
 function pickerCandidates() {
   const character = Characters.active();
   return normalise(candidatesFor(
@@ -308,15 +313,29 @@ function renderPickerRows() {
       kinds.map(k => `<option value="${esc(k)}">${esc(k[0].toUpperCase() + k.slice(1))}</option>`).join('');
   }
 
+  // "Scores nothing for this spec" and "has nothing to score" are different things, and the filter
+  // used to treat them alike. Librams, totems and idols carry no stats at all - they modify
+  // abilities - so every relic scored zero and the Ranged / Relic slot came up empty for Paladin,
+  // Shaman and Druid. An item with no stats is never hidden; there is nothing to judge it on.
   const filtered = all.filter(c =>
     (!search || c.item.name.toLowerCase().includes(search)) &&
     c.item.quality >= minQuality &&
     (!sourceFilter || c.sources.some(s => s.kind === sourceFilter)) &&
-    (!usableOnly || c.score > 0));
+    (!usableOnly || c.score > 0 || !hasScoreableStats(c.item)));
 
   document.getElementById('picker-rows').innerHTML =
     filtered.slice(0, 300).map(entry => renderPickerRow(data, entry)).join('');
   document.getElementById('picker-empty').hidden = filtered.length > 0;
+
+  // Where nothing in the slot can be scored, say so rather than showing a column of zeroes.
+  const unscorable = filtered.length > 0 && filtered.every(c => !hasScoreableStats(c.item));
+  const note = document.getElementById('picker-note');
+  note.hidden = !unscorable;
+  if (unscorable) {
+    note.textContent = 'These carry no stats — they change how an ability behaves, which the '
+      + 'stat-weight engine cannot rank. They are listed in database order; pick the one that suits '
+      + 'your spec.';
+  }
 }
 
 function equipItem(itemId) {

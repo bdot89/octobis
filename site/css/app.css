@@ -485,6 +485,15 @@ a:hover { text-decoration: underline; }
 .picker-controls .select-input { flex: 0 0 auto; }
 .checkbox { display: flex; align-items: center; gap: 0.4rem; color: var(--text-muted); font-size: 0.86rem; }
 
+.picker-note {
+  margin: 0 1.25rem 0.5rem;
+  padding: 0.5rem 0.7rem;
+  background: var(--bg-row);
+  border-left: 2px solid var(--accent);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
 .picker-body { overflow-y: auto; flex: 1; }
 
 .picker-table { width: 100%; border-collapse: collapse; }

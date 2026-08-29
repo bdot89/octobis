@@ -401,10 +401,15 @@ Please read these before treating any list as authoritative.
   as plain attack power they are ruinous — a hunter was handed Atiesh, a caster staff, for its
   "+420 Attack Power in Cat, Bear, and Dire Bear forms only", and 24 further pieces of feral gear
   were inflated the same way for every class that can wear leather.
-- **Relic slots come up empty** for Paladin, Shaman and Druid. Librams, totems and idols carry no
-  stats at all — they modify abilities — so there is nothing for a stat-weight engine to rank. The
-  slot says so rather than picking arbitrarily; give the good ones a bonus in `overrides.json` to
-  rank them.
+- **Relics cannot be ranked**, so auto-fill leaves the slot empty rather than guessing. Librams,
+  totems and idols carry no stats at all — they change how an ability behaves — and there is nothing
+  in that for a stat-weight engine. They are still listed in the slot picker, which says why the
+  scores are blank; give the good ones a bonus in `overrides.json` to rank them properly.
+
+  The picker's filter distinguishes "scores nothing for this spec" from "has nothing to score", and
+  only hides the first. Conflating them emptied the Ranged / Relic slot for Paladin, Shaman and
+  Druid, and hid the 41 pure-proc trinkets — Hand of Justice, Devilsaur Eye — which are exactly what
+  a manual picker is for.
 - **Not everything in the database is loot.** Quality 6 ("artifact") items — the Warglaives of
   Azzinoth and the Twin Blades — are dropped by the scraper, since vanilla never uses that tier for
   anything a player can obtain. GM weapons sitting at ordinary quality have to be named instead:
