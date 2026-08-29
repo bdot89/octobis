@@ -86,8 +86,17 @@ export function autoFill(data, character, spec, classDef, phaseId, overrides, hi
         })
       : candidates;
 
-    const pick = valued.reduce((best, c) => (best === null || c.score > best.score ? c : best), null);
-    if (!pick || pick.score <= 0) continue;
+    let pick = valued.reduce((best, c) => (best === null || c.score > best.score ? c : best), null);
+
+    // A slot where nothing scores is not a slot to leave empty. Relics carry no stats at all, so
+    // every one of them scores zero unless overrides.json ranks it, and the Ranged / Relic slot sat
+    // empty for Paladin, Shaman and Druid. Where the engine has no opinion, take the best item on
+    // the plain facts - quality, then item level - rather than nothing at all.
+    if ((!pick || pick.score <= 0) && !valued.some(c => c.score > 0)) {
+      pick = valued.reduce((best, c) => (best === null || better(c.item, best.item) ? c : best), null);
+    }
+
+    if (!pick) continue;
 
     equipped[slot.key] = pick.item.id;
     used.add(pick.item.id);
@@ -150,6 +159,13 @@ function candidateCache(data, character, spec, classDef, phaseId, overrides) {
     }
     return cache.get(slotKey);
   };
+}
+
+/** Fallback ordering when nothing can be scored: the plain facts on the item. */
+function better(a, b) {
+  if (a.quality !== b.quality) return a.quality > b.quality;
+  if ((a.ilvl ?? 0) !== (b.ilvl ?? 0)) return (a.ilvl ?? 0) > (b.ilvl ?? 0);
+  return a.name.localeCompare(b.name) < 0;
 }
 
 /** Total hit the set supplies, on top of whatever talents and enchants already give. */

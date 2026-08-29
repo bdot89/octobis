@@ -401,10 +401,15 @@ Please read these before treating any list as authoritative.
   as plain attack power they are ruinous — a hunter was handed Atiesh, a caster staff, for its
   "+420 Attack Power in Cat, Bear, and Dire Bear forms only", and 24 further pieces of feral gear
   were inflated the same way for every class that can wear leather.
-- **Relics cannot be ranked**, so auto-fill leaves the slot empty rather than guessing. Librams,
-  totems and idols carry no stats at all — they change how an ability behaves — and there is nothing
-  in that for a stat-weight engine. They are still listed in the slot picker, which says why the
-  scores are blank; give the good ones a bonus in `overrides.json` to rank them properly.
+- **Relics are ranked by hand**, in `overrides.json`, because they carry no stats for the engine to
+  weigh — they change how an ability behaves. Their effect text is specific enough to order them:
+  "Gives your Stormstrike a 35% chance to…" is plainly an Enhancement totem. Every relic spec has an
+  ordering, so auto-fill and the BiS list both pick one, and the numbers are relative — a relic only
+  ever competes with other relics. Correct them freely.
+
+  Where nothing in a slot can be scored at all, auto-fill falls back to the plain facts — quality,
+  then item level — rather than leaving the slot empty. It only does this when *no* candidate scores,
+  so a trinket slot with real options is never affected.
 
   The picker's filter distinguishes "scores nothing for this spec" from "has nothing to score", and
   only hides the first. Conflating them emptied the Ranged / Relic slot for Paladin, Shaman and

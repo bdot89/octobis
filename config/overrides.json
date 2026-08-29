@@ -85,6 +85,97 @@
       "note": {
         "_": "Combat rogues want a slow main hand and a fast off hand. The engine scores weapon DPS only, so check the speed column before committing to a pairing."
       }
+    },
+
+    "_relicComment": [
+      "Relics carry no stats, so the stat-weight engine has nothing to rank them on and auto-fill",
+      "would leave the slot empty. They do have effect text, and it is specific enough to order them",
+      "by hand: 'Gives your Stormstrike a 35% chance to...' is plainly an Enhancement totem.",
+      "",
+      "These bonuses are relative, not absolute. A relic only ever competes with other relics for the",
+      "same slot, so what matters is the ordering within a spec, not the size of the number. 30 is the",
+      "spec's pick, 20 and 10 are the runners-up. Anything unlisted still appears in the picker.",
+      "",
+      "Read off each relic's own tooltip, not off logs. Correct freely."
+    ],
+
+    "shaman.elemental": {
+      "bonus": { "61292": 30, "22395": 20, "55370": 10 },
+      "note": {
+        "61292": "Totem of Crackling Thunder - Lightning Bolt procs 8% casting speed, which compounds with everything else you cast.",
+        "22395": "Totem of Rage - flat damage on all three shocks."
+      }
+    },
+    "shaman.enhancement": {
+      "bonus": { "33089": 30, "61204": 25, "61292": 20 },
+      "note": {
+        "33089": "Totem of Thundercall - the Stormstrike totem, and Stormstrike is the rotation.",
+        "61204": "Totem of the Stonebreaker - 130 attack power on a 35% shock proc (Phase 3)."
+      }
+    },
+    "shaman.tank": {
+      "bonus": { "33092": 30, "33089": 20, "58174": 10 },
+      "note": {
+        "33092": "Totem of the Stonewall - Stoneclaw absorbs 200 on you and half that on the party. Mitigation beats threat once threat is holding.",
+        "33089": "Totem of Thundercall - take this instead while you are still fighting for threat."
+      }
+    },
+    "shaman.restoration": {
+      "bonus": { "33132": 30, "22396": 25, "23200": 15, "61698": 10 },
+      "note": {
+        "33132": "Totem of Calm Cascades - a bubble plus a heal-over-time on every Healing Wave crit.",
+        "22396": "Totem of Life - the larger Lesser Healing Wave bonus (Phase 4)."
+      }
+    },
+
+    "paladin.holy": {
+      "bonus": { "23006": 30, "23201": 20, "55470": 10 },
+      "note": {
+        "23006": "Libram of Light - the bigger Flash of Light bonus (Phase 6).",
+        "23201": "Libram of Divinity - the same effect, available from launch."
+      }
+    },
+    "paladin.protection": {
+      "bonus": { "61203": 30, "22400": 20, "61443": 15 },
+      "note": {
+        "61203": "Libram of the Dreamguard - an extra Holy Shield charge is a straight block (Phase 3).",
+        "22400": "Libram of Truth - +55 armour from Devotion Aura, and it never stops applying."
+      }
+    },
+    "paladin.retribution": {
+      "bonus": { "33087": 30, "58240": 20, "55110": 15 },
+      "note": {
+        "33087": "Libram of Ardour - more Seal of Command triggers is more of your damage.",
+        "58240": "Libram of Final Judgement - execute-range Judgement damage."
+      }
+    },
+
+    "druid.balance": {
+      "bonus": { "33098": 30, "55497": 20, "58179": 10 },
+      "note": {
+        "33098": "Idol of Equilibrium - procs off both Wrath and Starfire, so it works in either build.",
+        "55497": "Idol of Ebb and Flow - 0.2 sec off Starfire."
+      }
+    },
+    "druid.feral": {
+      "bonus": { "22397": 30, "61699": 20, "55082": 15 },
+      "note": {
+        "22397": "Idol of Ferocity - 3 energy off Claw and Rake, which is the cat rotation.",
+        "61699": "Idol of Savagery - faster Rake and Rip ticks."
+      }
+    },
+    "druid.guardian": {
+      "bonus": { "23198": 30, "55373": 20 },
+      "note": {
+        "23198": "Idol of Brutality - 3 rage off Maul and Swipe is more threat per rage, which is the bear's whole problem."
+      }
+    },
+    "druid.restoration": {
+      "bonus": { "22398": 30, "23004": 25, "22399": 20 },
+      "note": {
+        "22398": "Idol of Rejuvenation - +50 healing on the spell you cast most.",
+        "23004": "Idol of Longevity - mana back on every Healing Touch (Phase 6)."
+      }
     }
   }
 }
