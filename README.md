@@ -279,6 +279,11 @@ Two source kinds needed special handling, because both look launch-available and
   legendary quest rewards are excluded from the rule: they are endgame almost by definition, and
   theirs are exactly the quests nothing can place. Without that cut, Atiesh became launch gear and
   101 of the 224 class/spec/phase combinations equipped it.
+- **Atlas's crafting tables are recipe *spell* ids**, not item ids, and the namespaces collide:
+  spell 23067 is the Blue Firework recipe while item 23067 is Ring of the Cryptstalker. They are
+  resolved through `Spells.lua` before use. Reading them directly stapled "Crafted" onto whichever
+  item happened to share a number with a recipe — 149 items — and marked each one available from
+  launch, which is how a Naxxramas tier ring turned up in the launch planner.
 - **Crafted items** are only available when their recipe is, and recipe availability is not in the
   data. Where an item is both craftable and dropped, the drop decides: Yshgo'lar is listed as an
   Engineering craft but its only other source is C'Thun, so it is Ahn'Qiraj gear, not launch gear.

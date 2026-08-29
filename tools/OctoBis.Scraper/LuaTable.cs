@@ -213,9 +213,24 @@ public static class LuaTable
         {
             i++;
             SkipTrivia(s, ref i);
+
+            string? key = null;
             if (i < s.Length && s[i] is '"' or '\'')
             {
-                var key = ReadString(s, ref i);
+                key = ReadString(s, ref i);
+            }
+            else if (i < s.Length && char.IsDigit(s[i]))
+            {
+                // Numeric keys are keys, not array positions. Spells.lua is written entirely as
+                // `[23067] = { item = 9312 }`, and treating those as unkeyed elements loses the
+                // spell id - which is the half that says which recipe the entry is for.
+                var digits = i;
+                while (i < s.Length && char.IsDigit(s[i])) i++;
+                key = s[digits..i];
+            }
+
+            if (key is not null)
+            {
                 SkipTrivia(s, ref i);
                 if (i < s.Length && s[i] == ']')
                 {
@@ -224,6 +239,7 @@ public static class LuaTable
                     if (i < s.Length && s[i] == '=' && (i + 1 >= s.Length || s[i + 1] != '=')) { i++; return key; }
                 }
             }
+
             i = start;
             return null;
         }

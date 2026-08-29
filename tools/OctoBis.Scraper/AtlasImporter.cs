@@ -225,6 +225,64 @@ public sealed class AtlasImporter
     /// No phase is assigned here on purpose: these are imported as candidates, and each item's own
     /// page supplies its real sources and therefore its real phase.
     /// </summary>
+    /// <summary>
+    /// Recipe spell id -> the item the recipe produces.
+    ///
+    /// Crafting.lua lists <em>spell</em> ids, not item ids, and the two namespaces overlap: spell
+    /// 23067 is the Blue Firework recipe while item 23067 is Ring of the Cryptstalker. Reading the
+    /// crafting tables as item ids therefore attaches "Crafted" to whichever item happens to share
+    /// a number with a recipe, and marks it available from launch. That is how a Naxxramas tier
+    /// ring became an Engineering craft.
+    /// </summary>
+    public Dictionary<int, int> LoadSpellProducts()
+    {
+        var products = new Dictionary<int, int>();
+        var path = Path.Combine(_dataRoot, "Tables", "Spells.lua");
+
+        if (!File.Exists(path))
+        {
+            _warnings.Add($"Atlas table missing: {path}");
+            return products;
+        }
+
+        Dictionary<string, object?> assignments;
+        try
+        {
+            assignments = ParseFile(File.ReadAllText(path));
+        }
+        catch (Exception ex)
+        {
+            _warnings.Add($"Spells.lua: {ex.Message}");
+            return products;
+        }
+
+        var table = assignments.Values.OfType<Table>()
+            .OrderByDescending(t => t.Fields.Count)
+            .FirstOrDefault();
+
+        if (table is null)
+        {
+            _warnings.Add("Spells.lua: no spell table found");
+            return products;
+        }
+
+        // Entries are keyed by spell id, either at the top level or one level down per profession.
+        Collect(table);
+        foreach (var nested in table.Fields.Values.OfType<Table>()) Collect(nested);
+
+        void Collect(Table source)
+        {
+            foreach (var (key, value) in source.Fields)
+            {
+                if (value is not Table spell) continue;
+                if (!int.TryParse(key, out var spellId)) continue;
+                if (spell.Int("item") is { } itemId && itemId > 0) products.TryAdd(spellId, itemId);
+            }
+        }
+
+        return products;
+    }
+
     public Dictionary<string, List<int>> LoadSets()
     {
         var sets = new Dictionary<string, List<int>>(StringComparer.Ordinal);

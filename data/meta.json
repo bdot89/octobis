@@ -1,36 +1,36 @@
 {
-  "generated": "2026-08-28T22:16:02.4107706Z",
+  "generated": "2026-08-29T18:46:34.7878892Z",
   "databaseUrl": "https://octowow.st/db/",
   "counts": {
-    "items": 4047,
-    "itemsWithStats": 3906,
-    "itemsWithSources": 4030,
+    "items": 4016,
+    "itemsWithStats": 3876,
+    "itemsWithSources": 3998,
     "npcsCrawled": 1116,
-    "itemsDetailed": 4047,
-    "prunedStubs": 4086,
-    "skippedAsWorldDrop": 1098,
-    "abandonedSlowPages": 0,
+    "itemsDetailed": 4016,
+    "prunedStubs": 4081,
+    "skippedAsWorldDrop": 1120,
+    "abandonedSlowPages": 1,
     "retries": 0,
-    "cacheHits": 10146,
-    "networkFetches": 0
+    "cacheHits": 9575,
+    "networkFetches": 939
   },
   "itemsPerPhase": {
-    "0": 2896,
-    "1": 144,
-    "2": 206,
+    "0": 2950,
+    "1": 142,
+    "2": 220,
     "3": 32,
-    "4": 307,
-    "6": 182,
+    "4": 306,
+    "6": 183,
     "7": 87,
-    "unknown": 193
+    "unknown": 96
   },
-  "itemsWithUnknownPhase": 355,
-  "craftSourcesRephased": 66,
+  "itemsWithUnknownPhase": 259,
+  "craftSourcesRephased": 0,
   "atlas": {
-    "itemsFromAtlas": 7521,
+    "itemsFromAtlas": 7505,
     "recipesSkipped": 407,
     "catalogues": {
-      "Crafting.lua": 2217,
+      "Crafting.lua": 2214,
       "Factions.lua": 883
     },
     "setItems": 830,
@@ -216,12 +216,12 @@
       "WorldBluesFistWeapons": 1
     },
     "itemsMissingFromDatabase": {
-      "Blacksmithing": 176,
-      "Leatherworking": 124,
-      "Tailoring": 118,
+      "Leatherworking": 215,
+      "Tailoring": 215,
+      "Blacksmithing": 198,
+      "Engineering": 156,
+      "Jewelcrafting": 156,
       "Timbermaw Hold": 106,
-      "Engineering": 86,
-      "Jewelcrafting": 35,
       "Shendralar VP": 23,
       "Blackwing Lair": 19,
       "Lady Hederine": 8,
@@ -388,19 +388,19 @@
     ]
   },
   "unmatchedTooltipLines": {
-    "total": 1528,
-    "distinct": 1006,
+    "total": 1455,
+    "distinct": 960,
     "top": {
-      "This Item Begins a Quest": 74,
+      "This Item Begins a Quest": 72,
       "Use: Adds a mount to the player\u0027s mount collection.": 69,
-      "Use: Adds a companion to the player\u0027s companion collection.": 53,
       "Equip: Reduces damage taken from critical hits and damage over time effects by 3%.": 50,
+      "Use: Adds a companion to the player\u0027s companion collection.": 49,
       "Equip: Run speed increased slightly.": 48,
-      "Equip: Increases your effective stealth level by 1.": 10,
+      "Equip: Increases your effective stealth level by 1.": 9,
       "Use: Combines with Gri\u0027lek\u0027s Blood, Renataki\u0027s Tooth, Wushoolay\u0027s Mane, and Hazza\u0027rah\u0027s Dream Thread to form a powerful charm.": 9,
-      "16 Slot Bag": 7,
       "Equip: Allows underwater breathing.": 7,
       "Equip: \u002B5 All Resistances.": 7,
+      "16 Slot Bag": 6,
       "Equip: \u002B17 ranged Attack Power.": 6,
       "Use: Opens a Stratholme postbox.": 6,
       "Use: Returns you to the sanctuary of Dun Baldar.": 6,
@@ -418,7 +418,6 @@
       "Chance on hit: Launches a bolt of frost at the enemy causing 20 to 31 Frost damage and slowing movement speed by 50% for 5 sec.": 4,
       "Use: Reduces your fall speed for 10 sec.": 4,
       "Equip: Restores 5 health every 5 sec.": 4,
-      "Use: Teaches Lightning Bolt (Rank 5).": 4,
       "Chance on hit: Sends a shadowy bolt at the enemy causing 30 Shadow damage.": 3,
       "Use: Recombines the left, right and top pieces of Lord Valthalak\u0027s Amulet into one whole.": 3,
       "Equip: When struck in combat inflicts 3 Arcane damage to the attacker.": 3,
@@ -442,8 +441,6 @@
       "Equip: Increases mount speed by 3%.": 3,
       "Chance on hit: Wounds the target causing them to bleed for 110 damage over 30 sec.": 3,
       "Equip: Increases damage dealt by your pet by 3%.": 3,
-      "Use: Teaches Molten Blast (Rank 3).": 3,
-      "Use: Teaches Rejuvenation (Rank 4).": 3,
       "Equip: Increases swim speed by 15%.": 2,
       "Chance on hit: Corrosive acid that deals 7 Nature damage every 3 sec and lowers target\u0027s armor by 50 for 30 sec.": 2,
       "Equip: Attack Power increased by 24 when fighting Beasts.": 2,
@@ -470,7 +467,10 @@
       "Equip: Increased Swords \u002B2.": 2,
       "Equip: Improves your chance to get a critical strike with missile weapons by 1%.": 2,
       "Equip: Increased Maces \u002B2.": 2,
-      "Equip: Adds 3 Lightning damage to your melee attacks.": 2
+      "Equip: Adds 3 Lightning damage to your melee attacks.": 2,
+      "Equip: Increased Daggers \u002B7.": 2,
+      "Chance on hit: Disarm target\u0027s weapon for 5 sec.": 2,
+      "Chance on hit: Blasts a target for 10 to 21 Nature damage.": 2
     }
   }
 }

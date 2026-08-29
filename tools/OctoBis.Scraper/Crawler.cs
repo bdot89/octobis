@@ -188,9 +188,12 @@ public sealed class Crawler
             _report.AtlasSets[setName] = ids.Count;
         }
 
+        var recipeProducts = _config.Atlas.LoadSpellProducts();
+        _report.RecipeProducts = recipeProducts.Count;
         ImportCatalogue("Crafting.lua", SourceKind.Craft,
             entry => (AtlasImporter.ProfessionOf(entry.Category), AtlasImporter.ProfessionOf(entry.Category)),
-            AtlasImporter.CraftsGear);
+            AtlasImporter.CraftsGear,
+            resolveId: spellId => recipeProducts.TryGetValue(spellId, out var made) ? made : null);
 
         ImportCatalogue("Factions.lua", SourceKind.Reputation, entry =>
         {
@@ -200,6 +203,7 @@ public sealed class Crawler
         }, phaseOf: entry => _config.FactionPhaseFor(entry.Category));
 
         _report.AtlasItems = _items.Count;
+        Console.WriteLine($"Atlas: {_report.RecipeProducts} recipes resolved, {_report.UnresolvedRecipes} unresolved");
         Console.WriteLine($"Atlas: {instances.Count} instances, {instances.Sum(i => i.Bosses.Count)} encounters, " +
                           $"{_items.Count} items ({_report.AtlasRecipesSkipped} recipes skipped)");
     }
@@ -208,12 +212,18 @@ public sealed class Crawler
     /// Brings in one of the Tables/ catalogues as a source kind. These have no phase of their own -
     /// crafting and reputation are available from launch - and no drop rate.
     /// </summary>
+    /// <param name="resolveId">
+    /// Maps a catalogue id onto an item id. Crafting.lua lists recipe <em>spell</em> ids, and the
+    /// two namespaces collide - spell 23067 is the Blue Firework recipe, item 23067 is Ring of the
+    /// Cryptstalker - so those entries must be resolved through Spells.lua before use.
+    /// </param>
     private void ImportCatalogue(
         string fileName,
         SourceKind kind,
         Func<AtlasImporter.CatalogueEntry, (string Group, string Label)> describe,
         Func<string, bool>? categoryFilter = null,
-        Func<AtlasImporter.CatalogueEntry, int>? phaseOf = null)
+        Func<AtlasImporter.CatalogueEntry, int>? phaseOf = null,
+        Func<int, int?>? resolveId = null)
     {
         if (_config.Atlas is null) return;
 
@@ -224,10 +234,18 @@ public sealed class Crawler
             if (entry.Name is not null &&
                 new AtlasImporter.AtlasLoot { Name = entry.Name }.LooksLikeRecipe) continue;
 
+            // Crafting entries are recipe spells; everything else is already an item id.
+            var itemId = resolveId is null ? entry.ItemId : resolveId(entry.ItemId);
+            if (itemId is null)
+            {
+                _report.UnresolvedRecipes++;
+                continue;
+            }
+
             var (group, label) = describe(entry);
 
-            _items.TryAdd(entry.ItemId, new Item { Id = entry.ItemId, Name = entry.Name ?? "" });
-            AddSource(entry.ItemId, new ItemSource
+            _items.TryAdd(itemId.Value, new Item { Id = itemId.Value, Name = entry.Name ?? "" });
+            AddSource(itemId.Value, new ItemSource
             {
                 Kind = kind,
                 SourceId = 0,
@@ -856,6 +874,12 @@ public sealed class Report
     /// <summary>Quest rewards no zone or set could place, taken as available now.</summary>
     public int QuestRewardsPhasedAtLaunch { get; set; }
     public int CraftSourcesRephased { get; set; }
+
+    /// <summary>Recipe spells Spells.lua does not say the product of.</summary>
+    public int UnresolvedRecipes { get; set; }
+
+    /// <summary>Recipe spell to item mappings read from Spells.lua.</summary>
+    public int RecipeProducts { get; set; }
 
     /// <summary>Instance -> count of items Atlas lists that the database has no entry for.</summary>
     public Dictionary<string, int> AtlasItemsMissingFromDatabase { get; } = new();
