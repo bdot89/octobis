@@ -13,6 +13,14 @@ const RELIC_TYPES = new Set(['libram', 'idol', 'totem']);
 const MAIN_HAND = new Set([13, 21]);
 const OFF_HAND_WEAPON = new Set([13, 22]);
 const SHIELD = 14;
+
+/**
+ * The database labels a shield's slot "Off Hand", so shields arrive as inventory type 22 rather
+ * than 14. The subclass is what actually identifies one.
+ */
+function isShield(item) {
+  return item.type === 'shield' || item.slot === SHIELD;
+}
 const HELD_IN_OFF_HAND = 23;
 const TWO_HAND = 17;
 const RANGED_SLOTS = new Set([15, 25, 26, 28]);
@@ -164,9 +172,9 @@ function resolveWeapons(data, pool, classDef, spec, overrides) {
 
   const offCandidates = i => {
     if (style === 'dualwield') return OFF_HAND_WEAPON.has(i.slot);
-    if (style === 'onehandshield') return i.slot === SHIELD;
+    if (style === 'onehandshield') return isShield(i);
     // Casters and hunters take whatever gives the most stats in the off hand.
-    return i.slot === HELD_IN_OFF_HAND || i.slot === SHIELD || (style !== 'twohand' && OFF_HAND_WEAPON.has(i.slot));
+    return i.slot === HELD_IN_OFF_HAND || isShield(i) || (style !== 'twohand' && OFF_HAND_WEAPON.has(i.slot));
   };
   const offHands = rankFrom(offCandidates, 'offhand');
 

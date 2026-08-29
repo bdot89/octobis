@@ -223,6 +223,22 @@
           "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
         },
         {
+          "_comment": [
+            "Shaman tanking is OctoWoW's own, and the Enhancement tree is built for it: Ancestral",
+            "Guardian gives +15% armour from items and +6% dodge, Spirit Armor +30% armour from",
+            "shields and +10% threat while one is equipped, and Shield Specialization +5% block with",
+            "+30% block value. Calming Winds is the tell - it sheds threat, and stops doing so while",
+            "Rockbiter is active, which is the tank/damage toggle.",
+            "",
+            "Those talents shape the weights. Armour and block value are worth more here than to a",
+            "warrior because two talents multiply them, and shields are mandatory rather than",
+            "preferred. There is no parry: shamans cannot."
+          ],
+          "id": "tank", "name": "Enhancement (Tank)", "role": "tank", "weaponStyle": "onehandshield",
+          "weights": { "str": 0.9, "agi": 1.7, "sta": 3.2, "int": 0.1, "ap": 0.25, "armor": 0.2, "defense": 40, "dodge": 32, "block": 16, "blockValue": 3.4, "hit": 9, "crit": 6, "spellPower": 0.2, "mp5": 0.8, "resFire": 0.5, "resNature": 0.4, "resShadow": 0.3, "weaponDps": 1.2 },
+          "caps": { "defense": { "cap": 100, "postCapWeight": 20 }, "hit": { "cap": 9, "postCapWeight": 2 } }
+        },
+        {
           "id": "restoration", "name": "Restoration", "role": "healer", "school": "nature", "weaponStyle": "stats",
           "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.4, "spi": 0.15, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
         }

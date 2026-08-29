@@ -256,6 +256,36 @@ public class ItemPageParserTests
     }
 
     [Fact]
+    public void ShieldsAreIdentifiedAsShields()
+    {
+        // The row reads "Off Hand | Shield". "Shield" is in both the slot table and the type table,
+        // and matching the slot table first threw the type away - leaving no item in the database
+        // identifiable as a shield, so the class check could not gate them.
+        const string html = """
+            <td><table><tr><td><b class="q4">Scaleshield of Obsidian Flight</b><table width="100%"><tr><td>Off Hand</td><th>Shield</th></tr></table>2853 Armor<br />+24 Stamina<br /></td></tr></table>
+            """;
+
+        var item = ItemPageParser.Parse(html, 33155)!;
+
+        Assert.Equal("shield", item.SubClassName);
+        Assert.Equal(22, item.Slot);            // the database really does say Off Hand
+        Assert.Equal(2853, item.Stats["armor"]);
+    }
+
+    [Fact]
+    public void TheSlotColumnStillWinsWhenTheSlotIsUnknown()
+    {
+        const string html = """
+            <td><table><tr><td><b class="q3">Test Blade</b><table width="100%"><tr><td>Two-hand</td><th>Sword</th></tr></table>+10 Strength<br /></td></tr></table>
+            """;
+
+        var item = ItemPageParser.Parse(html, 1)!;
+
+        Assert.Equal(17, item.Slot);
+        Assert.Equal("sword", item.SubClassName);
+    }
+
+    [Fact]
     public void ReturnsNullWhenThePageHasNoItemTooltip()
     {
         Assert.Null(ItemPageParser.Parse("<html><body>Not an item page</body></html>", 1));

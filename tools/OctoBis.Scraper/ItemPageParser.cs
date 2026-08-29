@@ -122,9 +122,15 @@ public static partial class ItemPageParser
                 {
                     item.Stats["weaponSpeed"] = double.Parse(spd.Groups[1].Value, CultureInfo.InvariantCulture);
                 }
-                else if (SlotNames.TryGetValue(cell, out var invType))
+                // "Shield" and "Thrown" appear in both tables, and the row is slot then type:
+                // a shield reads "Off Hand | Shield". Matching the slot table first consumed the
+                // second cell as a slot name, discarded it because the slot was already set, and
+                // never recorded the type - so no item in the database was identifiably a shield.
+                // With no type, the class check could not gate shields and the BiS list's shield
+                // row matched nothing.
+                else if (SlotNames.TryGetValue(cell, out var invType) && item.Slot == 0)
                 {
-                    if (item.Slot == 0) item.Slot = invType;
+                    item.Slot = invType;
                 }
                 else if (TypeNames.Contains(cell))
                 {

@@ -364,6 +364,11 @@ Please read these before treating any list as authoritative.
   showing none.
 
   Add them to `config/overrides.json` if you know the bonuses from in-game.
+- **Shaman tanking is OctoWoW's own**, and `config/specs.json` documents where the weights come
+  from: Ancestral Guardian (+15% armour from items, +6% dodge), Spirit Armor (+30% armour from
+  shields, +10% threat while one is equipped) and Shield Specialization (+5% block, +30% block
+  value) are all in the Enhancement tree, and Calming Winds sheds threat except while Rockbiter is
+  active — the tank/damage toggle. The weights are read off those talents, not off logs.
 - **Race/class combinations are vanilla's.** OctoWoW states it opens up combinations beyond vanilla
   but does not publish them in a form worth guessing at, so `config/races.json` uses vanilla's plus
   the two added races. Correct that file if a combination is wrong — nothing else reads race data.

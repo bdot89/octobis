@@ -100,12 +100,53 @@ export function autoFill(data, character, spec, classDef, phaseId, overrides, hi
   return refine(data, spec, overrides, equipped, hitBudget, secured, pool);
 }
 
+/** Item inventory types, for the weapon-style rules below. */
+const TWO_HAND = 17;
+const WEAPON_SLOTS = new Set([13, 21, 22]);   // one-hand, main hand, off hand
+
+/** Shields arrive as inventory type 22 ("Off Hand"); the subclass is what identifies one. */
+const isShield = item => item.type === 'shield' || item.slot === 14;
+
+/**
+ * Whether the spec's weapon style permits this item in this slot.
+ *
+ * A Protection warrior holding a two-hander is not a Protection warrior: block, block value and
+ * every shield talent stop working, and the off hand sits empty. The BiS list has always resolved
+ * the pairing properly, but auto-fill filled each slot on its own merits and handed all four shield
+ * specs a two-hander - and now a shaman tank, whose Spirit Armor and Shield Specialization do
+ * nothing at all without one.
+ *
+ * The picker is deliberately left alone: browsing every option for a slot is useful even when
+ * auto-fill would not choose it.
+ */
+function allowedByStyle(slot, item, spec) {
+  const style = spec.weaponStyle ?? 'stats';
+
+  if (slot.key === 'mainhand') {
+    if (style === 'onehandshield' || style === 'dualwield') return item.slot !== TWO_HAND;
+    return true;
+  }
+
+  if (slot.key === 'offhand') {
+    if (style === 'onehandshield') return isShield(item);
+    if (style === 'dualwield') return WEAPON_SLOTS.has(item.slot) && !isShield(item);
+    return true;
+  }
+
+  return true;
+}
+
 /** Candidate lists are reused across every pass and every round, so they are only built once. */
 function candidateCache(data, character, spec, classDef, phaseId, overrides) {
   const cache = new Map();
   return slotKey => {
     if (!cache.has(slotKey)) {
-      cache.set(slotKey, candidatesFor(data, character, spec, classDef, phaseId, slotKey, overrides));
+      const slot = slotByKey(slotKey);
+      const all = candidatesFor(data, character, spec, classDef, phaseId, slotKey, overrides);
+      const usable = slot ? all.filter(c => allowedByStyle(slot, c.item, spec)) : all;
+      // Never leave a slot with nothing to choose from: a style rule that no item can satisfy is a
+      // gap in the data, and an empty hand is worse than an imperfect one.
+      cache.set(slotKey, usable.length > 0 ? usable : all);
     }
     return cache.get(slotKey);
   };
