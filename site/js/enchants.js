@@ -8,7 +8,7 @@ import { isTwoHanded } from './slots.js';
 
 /** Every slot can take something: enchants, a belt buckle, or a gem on a ring or amulet. */
 export const ENCHANTABLE = new Set([
-  'head', 'back', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet',
+  'head', 'shoulder', 'back', 'chest', 'wrist', 'hands', 'waist', 'legs', 'feet',
   'neck', 'finger1', 'finger2', 'mainhand', 'offhand'
 ]);
 

@@ -57,10 +57,14 @@ public sealed partial class AttachmentScraper
         await CollectItemsAsync(found, "Belt Buckle", "buckle", new[] { "waist" });
         await CollectItemsAsync(found, "Gemstone", "gem", new[] { "neck", "finger1", "finger2" });
 
-        // Head and leg enchants are reputation and quest items rather than enchanting recipes, so
-        // they only turn up by name.
+        // Head, shoulder and leg enchants are reputation and quest items rather than enchanting
+        // recipes, so they only turn up by name. The slots here are a starting guess; the effect
+        // wording overrides them, which is what puts the Zandalar signets on the shoulder.
         foreach (var term in new[] { "Arcanum", "Signet of", "Presence of Sight", "Syncretist", "Falcon's Call" })
             await CollectItemsAsync(found, term, "enchant", new[] { "head", "legs" });
+
+        foreach (var term in new[] { "of the Scourge", "Inscription of" })
+            await CollectItemsAsync(found, term, "enchant", new[] { "shoulder" });
 
         return found.Values
             .Where(a => a.Slots.Length > 0)
@@ -154,6 +158,10 @@ public sealed partial class AttachmentScraper
         if (text.Contains("ring or amulet") || text.Contains("amulet or ring"))
             return new[] { "neck", "finger1", "finger2" };
         if (text.Contains("to your belt") || text.Contains("a belt")) return new[] { "waist" };
+        // Must precede the head/leg case only in spirit - it is a different phrase entirely - but
+        // without it the Zandalar signets fell through to the search term's guess and were filed as
+        // head and leg enchants. They say "a shoulder slot item" and they are the shoulder enchants.
+        if (text.Contains("shoulder")) return new[] { "shoulder" };
         if (text.Contains("head or leg") || text.Contains("leg or head")) return new[] { "head", "legs" };
         if (text.Contains("your leg")) return new[] { "legs" };
         if (text.Contains("your head")) return new[] { "head" };

@@ -42,8 +42,13 @@ you can apply is offered in every phase.
 
 `--attachments` scrapes all three kinds straight from the database: **227 enchants, 28 jewelcrafting
 gems and 10 belt buckles**. Gems go on rings and amulets ("Permanently enchant a ring or amulet"),
-buckles on the waist, and head/leg enchants — which are reputation items rather than enchanting
-recipes — come in by name alongside the rest.
+buckles on the waist, and the head, shoulder and leg enchants — which are reputation items rather
+than enchanting recipes — come in by name alongside the rest.
+
+The slot comes from the effect wording, and the wording is the only thing that knows: the Zandalar
+signets say "adds to a shoulder slot item", and without a case for that they fell back to the search
+term's guess and were filed as head and leg enchants. The shoulder slot took no enchant at all,
+since it was missing from the list of enchantable slots.
 
 Stats are **parsed from the database's own effect wording**, not hand-curated: a spell page reads
 "Permanently enchant gloves to increase agility by 15" and that becomes `{ agi: 15 }`. Anything the
