@@ -138,7 +138,12 @@ export function hitProfile(data, config, character, spec, gear, talentBuild, wea
     };
   });
 
-  return { kind, total, fromGear, fromTalents, fromEnchants, fromEquipment, targets, weaponSkill: skill };
+  // Healing spells cannot miss. A spec that puts no weight on hit does not have a hit cap to reach,
+  // and telling one it is 16% short would send a healer shopping for a stat that does nothing.
+  const statKey = kind === 'spell' ? 'spellHit' : 'hit';
+  const needsHit = Boolean(spec?.weights?.[statKey]);
+
+  return { kind, needsHit, total, fromGear, fromTalents, fromEnchants, fromEquipment, targets, weaponSkill: skill };
 }
 
 /**

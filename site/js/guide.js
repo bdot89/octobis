@@ -234,7 +234,7 @@ export function renderGuide(data, config, character, cls, spec, phase, gear, tal
           <p class="panel-sub">${esc(mode === 'pvp' ? 'PvP' : 'PvE')} loadout · ${esc(phase.name)} ·
             gearing against <strong>${esc(primary.name)}</strong></p>
         </div>
-        <div class="guide-total">
+        <div class="guide-total"${profile.needsHit ? '' : ' hidden'}>
           <span class="score-value">${profile.total}%</span>
           <span class="score-label">${esc(kindName)} total</span>
           <span class="score-split">${profile.fromEquipment}% gear · ${round(profile.fromTalents.total)}% talents</span>
@@ -246,6 +246,11 @@ export function renderGuide(data, config, character, cls, spec, phase, gear, tal
             Auto-fill a set on the Planner tab to see where your hit actually lands.</p>`
         : ''}
 
+      ${!profile.needsHit
+        ? `<p class="phase-banner">Healing spells cannot miss, so ${esc(spec.name)} has no hit cap to
+            reach. Any hit on your gear is doing nothing — spend the budget on healing, mana and
+            survivability instead. Auto-fill ignores hit entirely for this spec.</p>`
+        : `
       ${weaponSkillPanel(config, profile, spec)}
 
       <div class="hit-cards">${profile.targets.map(t => targetCard(t, profile)).join('')}</div>
@@ -265,7 +270,7 @@ export function renderGuide(data, config, character, cls, spec, phase, gear, tal
       <p class="panel-note">
         Caps assume a level 60 with 300 weapon skill. Hit above a cap is worth nothing at all, which
         is why surplus is treated as a dead stat when ranking swaps.
-      </p>
+      </p>`}
     </div>`;
 }
 

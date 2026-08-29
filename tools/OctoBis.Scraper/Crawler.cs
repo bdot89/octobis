@@ -29,6 +29,12 @@ public sealed class Crawler
     private const int MinItemLevel = 55;
     private const int MinQuality = 3;
 
+    /// <summary>
+    /// Legendary. Above it is quality 6, "artifact", which vanilla never uses for anything a player
+    /// can obtain - the Warglaives of Azzinoth and the Twin Blades sit there. Not loot.
+    /// </summary>
+    private const int MaxQuality = 5;
+
     /// <summary>Drop rates at or above this are treated as real loot rather than a world drop.</summary>
     private const double WorldDropCeiling = 2.0;
 
@@ -514,7 +520,7 @@ public sealed class Crawler
         // Now that the tooltip has given us the real quality, apply the quality floor, along with
         // the checks that need a resolved slot. Random-suffix gear has no fixed stat line to rank.
         if (parsed.Slot == 0 || IgnoredSlots.Contains(parsed.Slot)
-            || parsed.HasRandomSuffix || parsed.Quality < MinQuality)
+            || parsed.HasRandomSuffix || parsed.Quality < MinQuality || parsed.Quality > MaxQuality)
         {
             _items.Remove(id);
             _sources.Remove(id);

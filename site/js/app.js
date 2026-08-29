@@ -619,11 +619,18 @@ function hitBudgetFor(character) {
     Characters.weaponSkill(character, data.hitcaps.weaponSkill?.base ?? 300),
     Characters.enchantsFor(character, phaseId));
 
+  const statKey = profile.kind === 'spell' ? 'spellHit' : 'hit';
+
+  // A spec that places no value on hit must not be driven to a cap. Healing spells cannot miss, so
+  // a Restoration shaman needs none at all - and the gap pass, which buys hit until the cap is met,
+  // does not know that on its own. It bought 16% spell hit and spent a healer's gear on it.
+  if (!spec.weights?.[statKey]) return null;
+
   const targetId = Characters.activeMode() === 'pvp' ? 'pvp' : 'boss';
   const target = profile.targets.find(t => t.id === targetId) ?? profile.targets[0];
 
   return {
-    statKey: profile.kind === 'spell' ? 'spellHit' : 'hit',
+    statKey,
     cap: target.cap,
     // Talents and enchants are already banked before a single item is chosen.
     alreadyHave: profile.total

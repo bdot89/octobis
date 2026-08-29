@@ -81,6 +81,11 @@ cap is treated as a constraint and the set is built in three passes:
 3. **Refine** — re-optimise every slot knowing the whole set, forbidden from dropping below the hit
    the gap pass secured.
 
+A spec that puts no weight on hit gets no budget and skips all three passes. Healing spells cannot
+miss, so a Restoration shaman needs none — and the gap pass, which buys hit until the cap is met,
+has no way to know that on its own. It bought 16% spell hit and spent a healer's gear on it, leaving
+121 healing power where the same slots now hold 480.
+
 Talents and enchants are counted before a single item is chosen, so the gear only shops for the
 remainder. Where the cap cannot be reached at all — 16% spell hit does not exist in Launch-phase
 gear — the second pass reports what it actually managed, and the third optimises around that instead
@@ -395,6 +400,12 @@ Please read these before treating any list as authoritative.
   stats at all — they modify abilities — so there is nothing for a stat-weight engine to rank. The
   slot says so rather than picking arbitrarily; give the good ones a bonus in `overrides.json` to
   rank them.
+- **Not everything in the database is loot.** Quality 6 ("artifact") items — the Warglaives of
+  Azzinoth and the Twin Blades — are dropped by the scraper, since vanilla never uses that tier for
+  anything a player can obtain. GM weapons sitting at ordinary quality have to be named instead:
+  Andonisus, Reaper of Souls grants +600 attack power, and Atlas lists it under a summoned
+  Stratholme encounter, so it read as launch loot. It is excluded in the `*` scope of
+  `config/overrides.json`, which is where anything else of the kind belongs.
 - **Unreleased phases reflect today's database.** Loot tables for content that has not shipped are
   whatever the server holds now and may still change.
 - **Phase 5 (Timbermaw Hold) is empty.** Atlas knows the raid — 11 encounters, 143 items — but the

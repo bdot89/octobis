@@ -27,7 +27,23 @@
     "bonuses belong on the physical classes, and vice versa."
   ],
 
+  "_excludeComment": [
+    "Items the database carries that are not obtainable loot: GM and test weapons. They are excluded",
+    "in the '*' scope rather than per-class, because 'not real loot' is not a property of who is",
+    "looking at it.",
+    "",
+    "Quality 6 (artifact) items — the Warglaives of Azzinoth and the Twin Blades — are dropped by the",
+    "scraper itself and need no entry here."
+  ],
+
   "scopes": {
+    "*": {
+      "exclude": ["22736"],
+      "note": {
+        "22736": "Andonisus, Reaper of Souls - a GM weapon granting +600 attack power. Atlas lists it under a summoned Stratholme encounter, which is what placed it in the launch planner."
+      }
+    },
+
     "warrior": {
       "bonus": { "19406": 120, "17069": 90 },
       "note": {
