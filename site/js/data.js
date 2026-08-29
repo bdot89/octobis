@@ -127,9 +127,19 @@ export async function loadAll() {
   };
 }
 
-/** Full URL for an item's icon, or null when the item has none. */
+/**
+ * Full URL for an item's icon.
+ *
+ * 552 items have no art in the database and it serves INV_Misc_QuestionMark for them - almost all
+ * of OctoWoW's own additions. The scraper drops that placeholder so the data never claims an icon
+ * it does not have, but the slot still needs filling, and the question mark is exactly what the
+ * database and the game itself show. An empty box just reads as broken.
+ */
+export const PLACEHOLDER_ICON = 'inv_misc_questionmark';
+
 export function iconUrl(data, item) {
-  return item?.icon ? `${data.iconBase}${item.icon}${data.iconExtension}` : null;
+  if (!item) return null;
+  return `${data.iconBase}${item.icon || PLACEHOLDER_ICON}${data.iconExtension}`;
 }
 
 /** Sources for an item, newest-phase-last, or an empty list. */

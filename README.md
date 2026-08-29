@@ -420,6 +420,14 @@ Please read these before treating any list as authoritative.
   only hides the first. Conflating them emptied the Ranged / Relic slot for Paladin, Shaman and
   Druid, and hid the 41 pure-proc trinkets — Hand of Justice, Devilsaur Eye — which are exactly what
   a manual picker is for.
+- **552 items have no icon in the database.** It serves INV_Misc_QuestionMark for them, almost
+  all of OctoWoW's own additions. The scraper drops that placeholder so the data never claims art
+  it does not have, and the site falls back to it when rendering — the question mark is what the
+  database and the game both show, and an empty box just reads as broken.
+
+  Icons are hotlinked from octowow.st. `--download-icons` bundles them under `site/assets/icons`
+  instead, which removes the per-visitor load on their server; the placeholder is included so those
+  552 do not break in a local bundle.
 - **Not everything in the database is loot.** Quality 6 ("artifact") items — the Warglaives of
   Azzinoth and the Twin Blades — are dropped by the scraper, since vanilla never uses that tier for
   anything a player can obtain. GM weapons sitting at ordinary quality have to be named instead:

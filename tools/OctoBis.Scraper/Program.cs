@@ -307,7 +307,13 @@ if (downloadIcons)
     Console.WriteLine();
     Console.WriteLine("Downloading icons...");
     var iconDir = Path.Combine(repoRoot, "site", "assets", "icons");
-    var wanted = items.Select(i => i.Icon).Where(i => !string.IsNullOrEmpty(i)).Distinct().ToList();
+    // The placeholder is a real icon as far as the site is concerned: items the database has no art
+    // for fall back to it rather than showing an empty box, so a local bundle needs it too.
+    var wanted = items.Select(i => i.Icon)
+        .Where(i => !string.IsNullOrEmpty(i))
+        .Append("inv_misc_questionmark")
+        .Distinct()
+        .ToList();
     var got = 0;
     foreach (var icon in wanted)
     {
