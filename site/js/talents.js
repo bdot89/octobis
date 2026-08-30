@@ -20,6 +20,19 @@ export function spentIn(build, treeIndex) {
     .reduce((sum, [, ranks]) => sum + ranks, 0);
 }
 
+/**
+ * Points spent in the rows above a given row - which is what a tier requirement actually counts.
+ * A talent never pays for its own tier.
+ */
+export function spentBelowRow(build, treeIndex, tree, row) {
+  let sum = 0;
+  for (const talent of tree.talents) {
+    if (talent.row >= row) continue;
+    sum += build[`${treeIndex}:${talent.cell}`] ?? 0;
+  }
+  return sum;
+}
+
 export function totalSpent(build) {
   return Object.values(build).reduce((sum, ranks) => sum + ranks, 0);
 }
@@ -76,8 +89,10 @@ export function canRemove(talents, classId, build, treeIndex, talent) {
       if (ranksOf(after, treeIndex, talent.cell) < required) return false;
     }
 
-    // Spending would drop below what this talent's tier demands.
-    if (spentIn(after, treeIndex) < other.row * POINTS_PER_TIER) return false;
+    // Spending would drop below what this talent's tier demands. Only points in the rows below
+    // it count towards its requirement - counting the dependent talent's own rank let a build
+    // untrain into a state blockedReason itself refuses to build ("Requires 10 points - you have 9").
+    if (spentBelowRow(after, treeIndex, tree, other.row) < other.row * POINTS_PER_TIER) return false;
   }
 
   return true;

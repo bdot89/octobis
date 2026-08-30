@@ -51,6 +51,36 @@ function overridesOf(character) {
  * hit before equipping anything, so a totals panel that counts gear alone tells them they are 10%
  * further from the cap than they really are, and the number it shows is not their character's.
  */
+/**
+ * How much hit each BiS row already has, taken from the auto-filled set.
+ *
+ * The BiS list ranks slot by slot, so it needs to know what the rest of the set supplies before it
+ * can tell a useful point of hit from a wasted one. Auto-fill has already solved that, so the list
+ * borrows its answer rather than solving it again differently.
+ */
+function hitBySlotFor(character, budget) {
+  if (!budget) return {};
+
+  const spec = specOf(character);
+  const cls = classOf(character);
+  const gear = autoFill(data, character, spec, cls, phaseId, overridesOf(character), budget);
+
+  // Planner slot keys map onto BiS row ids; rings and trinkets are two slots under one row.
+  const rows = {
+    head: ['head'], neck: ['neck'], shoulder: ['shoulder'], back: ['back'], chest: ['chest'],
+    wrist: ['wrist'], hands: ['hands'], waist: ['waist'], legs: ['legs'], feet: ['feet'],
+    finger: ['finger1', 'finger2'], trinket: ['trinket1', 'trinket2'],
+    weapon: ['mainhand'], offhand: ['offhand'], ranged: ['ranged']
+  };
+
+  const hit = {};
+  for (const [rowId, keys] of Object.entries(rows)) {
+    hit[rowId] = keys.reduce(
+      (sum, key) => sum + (data.byId.get(gear[key])?.stats?.[budget.statKey] ?? 0), 0);
+  }
+  return hit;
+}
+
 /** Ids of everything the active character is wearing in the current phase and loadout. */
 function equippedIds() {
   const character = Characters.active();
@@ -109,7 +139,8 @@ function render() {
     return;
   }
 
-  const rows = buildBis(data, cls, spec, phaseId, overrides);
+  const budget = hitBudgetFor(character);
+  const rows = buildBis(data, cls, spec, phaseId, overrides, budget, hitBySlotFor(character, budget));
   view.innerHTML = `
     <div class="list-view">
       <h1>${esc(cls.name)} <span class="spec-name">${esc(spec.name)}</span>
@@ -345,9 +376,12 @@ function equipItem(itemId) {
 
   const gear = { ...Characters.gearFor(character, phaseId) };
 
-  // The same item cannot occupy both rings or both trinkets at once.
-  for (const sibling of siblingSlots(pickerSlot)) {
-    if (sibling !== pickerSlot && gear[sibling] === itemId) delete gear[sibling];
+  // A unique item cannot occupy both rings or both trinkets at once - but an ordinary one can,
+  // and people do wear two of the same ring. Only clear the sibling when the game would.
+  if (item.unique) {
+    for (const sibling of siblingSlots(pickerSlot)) {
+      if (sibling !== pickerSlot && gear[sibling] === itemId) delete gear[sibling];
+    }
   }
 
   gear[pickerSlot] = itemId;
@@ -357,8 +391,31 @@ function equipItem(itemId) {
   if (pickerSlot === 'offhand' && isTwoHanded(data.byId.get(gear.mainhand))) delete gear.mainhand;
 
   Characters.equipMany(character, phaseId, gear);
+  dropStrandedEnchants(character, gear);
   closeModals();
   render();
+}
+
+/**
+ * Clears any enchant whose slot no longer offers it.
+ *
+ * Enchants are stored per slot, not per item, so swapping a shield out for a sword left the
+ * shield's Greater Stamina still counted and still displayed. Re-checking against what the slot
+ * actually offers now is the same test the enchant picker uses.
+ */
+function dropStrandedEnchants(character, gear) {
+  const applied = Characters.enchantsFor(character, phaseId);
+
+  for (const [slotKey, key] of Object.entries(applied)) {
+    if (!key) continue;
+
+    const item = data.byId.get(gear[slotKey]);
+    const offered = item
+      ? enchantsForSlot(data.enchantIndex, slotKey, item)
+      : [];
+
+    if (!offered.some(e => e.key === key)) Characters.setEnchant(character, phaseId, slotKey, null);
+  }
 }
 
 function closeModals() {
@@ -651,6 +708,10 @@ function hitBudgetFor(character) {
   return {
     statKey,
     cap: target.cap,
+    // White swings while dual wielding carry a further penalty, so hit past the yellow cap is not
+    // dead for those specs - only worth less. A single cliff at the yellow cap threw away real
+    // value for Fury, Combat, Assassination and Subtlety.
+    whiteCap: spec.weaponStyle === 'dualwield' ? target.dualWieldWhiteCap ?? null : null,
     // Talents and enchants are already banked before a single item is chosen.
     alreadyHave: profile.total
   };

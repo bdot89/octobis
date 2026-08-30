@@ -116,6 +116,9 @@ const WEAPON_SLOTS = new Set([13, 21, 22]);   // one-hand, main hand, off hand
 /** Shields arrive as inventory type 22 ("Off Hand"); the subclass is what identifies one. */
 const isShield = item => item.type === 'shield' || item.slot === 14;
 
+/** Held-in-off-hand: tomes, orbs and the like. Not a weapon, so anyone may hold one. */
+const HELD_IN_OFF_HAND = 23;
+
 /**
  * Whether the spec's weapon style permits this item in this slot.
  *
@@ -128,18 +131,23 @@ const isShield = item => item.type === 'shield' || item.slot === 14;
  * The picker is deliberately left alone: browsing every option for a slot is useful even when
  * auto-fill would not choose it.
  */
-function allowedByStyle(slot, item, spec) {
+export function allowedByStyle(slot, item, spec) {
   const style = spec.weaponStyle ?? 'stats';
 
   if (slot.key === 'mainhand') {
-    if (style === 'onehandshield' || style === 'dualwield') return item.slot !== TWO_HAND;
+    if (style === 'onehandshield' || style === 'onehandoffhand' || style === 'dualwield') {
+      return item.slot !== TWO_HAND;
+    }
     return true;
   }
 
   if (slot.key === 'offhand') {
     if (style === 'onehandshield') return isShield(item);
+    // A shield or a held item, never a second weapon: Shamans cannot dual-wield on OctoWoW.
+    if (style === 'onehandoffhand') return isShield(item) || item.slot === HELD_IN_OFF_HAND;
     if (style === 'dualwield') return WEAPON_SLOTS.has(item.slot) && !isShield(item);
-    return true;
+    // Casters and hunters: a held item or a shield, but not a weapon they cannot swing.
+    return !WEAPON_SLOTS.has(item.slot) || isShield(item);
   }
 
   return true;
@@ -161,10 +169,17 @@ function candidateCache(data, character, spec, classDef, phaseId, overrides) {
   };
 }
 
-/** Fallback ordering when nothing can be scored: the plain facts on the item. */
+/**
+ * Fallback ordering when nothing can be scored: the plain facts on the item.
+ *
+ * Item level would be the natural tiebreak but the database does not put it in the tooltip, so it
+ * is 0 on all but four items and sorts nothing. Required level is present and carries most of the
+ * same signal.
+ */
 function better(a, b) {
   if (a.quality !== b.quality) return a.quality > b.quality;
   if ((a.ilvl ?? 0) !== (b.ilvl ?? 0)) return (a.ilvl ?? 0) > (b.ilvl ?? 0);
+  if ((a.req ?? 0) !== (b.req ?? 0)) return (a.req ?? 0) > (b.req ?? 0);
   return a.name.localeCompare(b.name) < 0;
 }
 

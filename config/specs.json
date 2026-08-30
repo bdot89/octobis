@@ -12,8 +12,9 @@
     "as spellPower + spellDmg<school>, so '+30 Fire Damage' counts fully for a Fire mage and not at",
     "all for a Frost one, without double-counting generic '+30 Spell Damage'.",
     "",
-    "A cap entry means value above 'cap' is scored at 'postCapWeight' instead of the full weight.",
-    "This is applied per item, which is an approximation - see README."
+    "There is deliberately no per-item cap. A cap is a property of the whole set - no single item",
+    "carries 9% hit or 100 defense - so a per-item cap can never fire. Hit is handled as a set-level",
+    "budget in the engine instead; see README."
   ],
 
   "statKeys": [
@@ -23,7 +24,8 @@
     "haste", "armorPen",
     "defense", "dodge", "parry", "block", "blockValue",
     "resFire", "resNature", "resFrost", "resShadow", "resArcane",
-    "weaponDps", "rangedDps"
+    "weaponDps", "rangedDps",
+    "leech", "apFeral", "apVsTarget", "flatMeleeDamage"
   ],
 
   "_extraStatsComment": [
@@ -40,6 +42,11 @@
     "-> caster, anything else -> melee."
   ],
   "defaults": {
+    "_leechComment": [
+      "leech (Vampirism) heals a share of damage dealt. One flat weight cannot express it: against a",
+      "single boss it is noise, against a large pack it scales with the target count without bound.",
+      "These numbers price it for single-target, which is the question these lists answer."
+    ],
     "melee":  { "haste": 14, "armorPen": 0.15, "leech": 2 },
     "caster": { "mp5WhileCasting": 0.8 },
     "healer": { "mp5WhileCasting": 1.5 },
@@ -62,18 +69,15 @@
       "specs": [
         {
           "id": "arms", "name": "Arms", "role": "dps", "weaponStyle": "twohand",
-          "weights": { "str": 2.2, "agi": 1.4, "sta": 0.1, "ap": 1.0, "crit": 30, "hit": 32, "weaponDps": 12, "resFire": 0.1 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "str": 2.2, "agi": 1.4, "sta": 0.1, "ap": 1.0, "crit": 30, "hit": 32, "weaponDps": 12, "resFire": 0.1 }
         },
         {
           "id": "fury", "name": "Fury", "role": "dps", "weaponStyle": "dualwield",
-          "weights": { "str": 2.2, "agi": 1.4, "sta": 0.1, "ap": 1.0, "crit": 22, "hit": 38, "weaponDps": 7, "resFire": 0.1 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "str": 2.2, "agi": 1.4, "sta": 0.1, "ap": 1.0, "crit": 22, "hit": 38, "weaponDps": 7, "resFire": 0.1 }
         },
         {
           "id": "protection", "name": "Protection", "role": "tank", "weaponStyle": "onehandshield",
-          "weights": { "str": 1.0, "agi": 1.6, "sta": 3.2, "ap": 0.3, "armor": 0.16, "defense": 42, "dodge": 30, "parry": 30, "block": 14, "blockValue": 2.5, "hit": 10, "crit": 7, "resFire": 0.6, "resNature": 0.3, "resShadow": 0.3, "weaponDps": 1.5 },
-          "caps": { "defense": { "cap": 100, "postCapWeight": 20 } }
+          "weights": { "str": 1.0, "agi": 1.6, "sta": 3.2, "ap": 0.3, "armor": 0.16, "defense": 6, "dodge": 30, "parry": 30, "block": 14, "blockValue": 2.5, "hit": 10, "crit": 7, "resFire": 0.6, "resNature": 0.3, "resShadow": 0.3, "weaponDps": 1.5 }
         }
       ]
     },
@@ -93,17 +97,15 @@
       "specs": [
         {
           "id": "holy", "name": "Holy", "role": "healer", "school": "holy", "weaponStyle": "onehandshield",
-          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.36, "spi": 0.12, "mp5": 6.5, "spellCrit": 9, "sta": 0.06, "str": 0.02 }
+          "weights": { "healPower": 1.0, "spellPower": 1.0, "int": 0.36, "spi": 0.12, "mp5": 6.5, "spellCrit": 9, "sta": 0.06, "str": 0.02 }
         },
         {
           "id": "retribution", "name": "Retribution", "role": "dps", "weaponStyle": "twohand",
-          "weights": { "str": 2.2, "agi": 1.1, "sta": 0.1, "int": 0.05, "ap": 1.0, "crit": 26, "hit": 30, "weaponDps": 13, "spellPower": 0.25 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "str": 2.2, "agi": 1.1, "sta": 0.1, "int": 0.05, "ap": 1.0, "crit": 26, "hit": 30, "weaponDps": 13, "spellPower": 0.25 }
         },
         {
           "id": "protection", "name": "Protection", "role": "tank", "weaponStyle": "onehandshield",
-          "weights": { "str": 1.1, "agi": 1.4, "sta": 3.0, "int": 0.15, "ap": 0.3, "armor": 0.16, "defense": 40, "dodge": 28, "parry": 28, "block": 16, "blockValue": 3.0, "hit": 9, "crit": 7, "spellPower": 0.3, "resFire": 0.5, "resShadow": 0.3 },
-          "caps": { "defense": { "cap": 100, "postCapWeight": 20 } }
+          "weights": { "str": 1.1, "agi": 1.4, "sta": 3.0, "int": 0.15, "ap": 0.3, "armor": 0.16, "defense": 6, "dodge": 28, "parry": 28, "block": 16, "blockValue": 3.0, "hit": 9, "crit": 7, "spellPower": 0.3, "resFire": 0.5, "resShadow": 0.3 }
         }
       ]
     },
@@ -123,18 +125,15 @@
       "specs": [
         {
           "id": "beastmastery", "name": "Beast Mastery", "role": "dps", "weaponStyle": "stats",
-          "weights": { "agi": 1.8, "str": 0.1, "sta": 0.1, "int": 0.12, "rap": 1.0, "ap": 0.35, "crit": 28, "hit": 33, "rangedDps": 16, "mp5": 0.4, "haste": 2 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "agi": 1.8, "str": 0.1, "sta": 0.1, "int": 0.12, "rap": 1.0, "ap": 0.35, "crit": 28, "hit": 33, "rangedDps": 16, "mp5": 0.4, "haste": 2 }
         },
         {
           "id": "marksmanship", "name": "Marksmanship", "role": "dps", "weaponStyle": "stats",
-          "weights": { "agi": 1.85, "str": 0.1, "sta": 0.1, "int": 0.15, "rap": 1.0, "ap": 0.3, "crit": 30, "hit": 34, "rangedDps": 18, "mp5": 0.4, "haste": 2 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "agi": 1.85, "str": 0.1, "sta": 0.1, "int": 0.15, "rap": 1.0, "ap": 0.3, "crit": 30, "hit": 34, "rangedDps": 18, "mp5": 0.4, "haste": 2 }
         },
         {
           "id": "survival", "name": "Survival", "role": "dps", "weaponStyle": "stats",
-          "weights": { "agi": 2.0, "str": 0.2, "sta": 0.15, "int": 0.12, "rap": 1.0, "ap": 0.4, "crit": 27, "hit": 33, "rangedDps": 15, "weaponDps": 1.5, "mp5": 0.4, "haste": 2 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "agi": 2.0, "str": 0.2, "sta": 0.15, "int": 0.12, "rap": 1.0, "ap": 0.4, "crit": 27, "hit": 33, "rangedDps": 15, "weaponDps": 1.5, "mp5": 0.4, "haste": 2 }
         }
       ]
     },
@@ -154,18 +153,15 @@
       "specs": [
         {
           "id": "combat", "name": "Combat", "role": "dps", "weaponStyle": "dualwield",
-          "weights": { "agi": 2.0, "str": 1.0, "sta": 0.1, "ap": 1.0, "crit": 24, "hit": 36, "weaponDps": 9 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "agi": 2.0, "str": 1.0, "sta": 0.1, "ap": 1.0, "crit": 24, "hit": 36, "weaponDps": 9 }
         },
         {
           "id": "assassination", "name": "Assassination", "role": "dps", "weaponStyle": "dualwield",
-          "weights": { "agi": 2.1, "str": 1.0, "sta": 0.1, "ap": 1.0, "crit": 27, "hit": 34, "weaponDps": 7 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "agi": 2.1, "str": 1.0, "sta": 0.1, "ap": 1.0, "crit": 27, "hit": 34, "weaponDps": 7 }
         },
         {
           "id": "subtlety", "name": "Subtlety", "role": "dps", "weaponStyle": "dualwield",
-          "weights": { "agi": 2.1, "str": 0.9, "sta": 0.15, "ap": 1.0, "crit": 25, "hit": 34, "weaponDps": 7 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "agi": 2.1, "str": 0.9, "sta": 0.15, "ap": 1.0, "crit": 25, "hit": 34, "weaponDps": 7 }
         }
       ]
     },
@@ -185,16 +181,15 @@
       "specs": [
         {
           "id": "holy", "name": "Holy", "role": "healer", "school": "holy", "weaponStyle": "stats",
-          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.38, "spi": 0.22, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
+          "weights": { "healPower": 1.0, "spellPower": 1.0, "int": 0.38, "spi": 0.22, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
         },
         {
           "id": "discipline", "name": "Discipline", "role": "healer", "school": "holy", "weaponStyle": "stats",
-          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.42, "spi": 0.18, "mp5": 7.0, "spellCrit": 9, "sta": 0.06 }
+          "weights": { "healPower": 1.0, "spellPower": 1.0, "int": 0.42, "spi": 0.18, "mp5": 7.0, "spellCrit": 9, "sta": 0.06 }
         },
         {
           "id": "shadow", "name": "Shadow", "role": "dps", "school": "shadow", "weaponStyle": "stats",
-          "weights": { "spellPower": 1.0, "int": 0.32, "spi": 0.12, "spellHit": 13, "spellCrit": 10, "spellPen": 0.35, "mp5": 2.5, "sta": 0.06 },
-          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+          "weights": { "spellPower": 1.0, "int": 0.32, "spi": 0.12, "spellHit": 13, "spellCrit": 10, "spellPen": 0.35, "mp5": 2.5, "sta": 0.06 }
         }
       ]
     },
@@ -214,13 +209,17 @@
       "specs": [
         {
           "id": "elemental", "name": "Elemental", "role": "dps", "school": "nature", "weaponStyle": "stats",
-          "weights": { "spellPower": 1.0, "int": 0.35, "spi": 0.1, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 3.0, "sta": 0.06 },
-          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+          "weights": { "spellPower": 1.0, "int": 0.22, "spi": 0.1, "spellHit": 8, "spellCrit": 7, "spellPen": 0.3, "mp5": 3.0, "sta": 0.06 }
         },
         {
-          "id": "enhancement", "name": "Enhancement", "role": "dps", "weaponStyle": "dualwield",
-          "weights": { "str": 2.0, "agi": 1.5, "sta": 0.15, "int": 0.1, "ap": 1.0, "crit": 24, "hit": 34, "weaponDps": 8, "spellPower": 0.2, "mp5": 1.5 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "_comment": [
+            "onehandoffhand, not dualwield: Shamans cannot dual-wield on OctoWoW. Dual Wield (spell",
+            "674) is taught only by Warrior, Rogue and Hunter trainers, and none of the 51 shaman",
+            "talents grants it. Enhancement is played one-hander plus shield, or one-hander plus a",
+            "held off-hand item - so the off hand offers those and never a second weapon."
+          ],
+          "id": "enhancement", "name": "Enhancement", "role": "dps", "weaponStyle": "onehandoffhand",
+          "weights": { "str": 2.0, "agi": 1.25, "sta": 0.15, "int": 0.1, "ap": 1.0, "crit": 24, "hit": 34, "weaponDps": 8, "spellPower": 0.2, "mp5": 1.5 }
         },
         {
           "_comment": [
@@ -232,15 +231,15 @@
             "",
             "Those talents shape the weights. Armour and block value are worth more here than to a",
             "warrior because two talents multiply them, and shields are mandatory rather than",
-            "preferred. There is no parry: shamans cannot."
+            "preferred. Shamans parry here - it is a baseline skill on this server, confirmed in a combat",
+            "log - so parry is weighted at parity with dodge."
           ],
           "id": "tank", "name": "Enhancement (Tank)", "role": "tank", "weaponStyle": "onehandshield",
-          "weights": { "str": 0.9, "agi": 1.7, "sta": 3.2, "int": 0.1, "ap": 0.25, "armor": 0.2, "defense": 40, "dodge": 32, "block": 16, "blockValue": 3.4, "hit": 9, "crit": 6, "spellPower": 0.2, "mp5": 0.8, "resFire": 0.5, "resNature": 0.4, "resShadow": 0.3, "weaponDps": 1.2 },
-          "caps": { "defense": { "cap": 100, "postCapWeight": 20 }, "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "str": 0.9, "agi": 2.3, "sta": 3.2, "int": 0.1, "ap": 0.25, "armor": 0.2, "defense": 6, "dodge": 32, "parry": 32, "block": 16, "blockValue": 3.4, "hit": 9, "crit": 6, "spellPower": 0.2, "mp5": 0.8, "resFire": 0.5, "resNature": 0.4, "resShadow": 0.3, "weaponDps": 1.2 }
         },
         {
           "id": "restoration", "name": "Restoration", "role": "healer", "school": "nature", "weaponStyle": "stats",
-          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.4, "spi": 0.15, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
+          "weights": { "healPower": 1.0, "spellPower": 1.0, "int": 0.4, "spi": 0.15, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
         }
       ]
     },
@@ -260,18 +259,15 @@
       "specs": [
         {
           "id": "fire", "name": "Fire", "role": "dps", "school": "fire", "weaponStyle": "stats",
-          "weights": { "spellPower": 1.0, "int": 0.33, "spi": 0.08, "spellHit": 14, "spellCrit": 13, "spellPen": 0.3, "mp5": 2.5, "sta": 0.06 },
-          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+          "weights": { "spellPower": 1.0, "int": 0.33, "spi": 0.08, "spellHit": 14, "spellCrit": 13, "spellPen": 0.3, "mp5": 2.5, "sta": 0.06 }
         },
         {
           "id": "frost", "name": "Frost", "role": "dps", "school": "frost", "weaponStyle": "stats",
-          "weights": { "spellPower": 1.0, "int": 0.33, "spi": 0.08, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 2.5, "sta": 0.06 },
-          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+          "weights": { "spellPower": 1.0, "int": 0.33, "spi": 0.08, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 2.5, "sta": 0.06 }
         },
         {
           "id": "arcane", "name": "Arcane", "role": "dps", "school": "arcane", "weaponStyle": "stats",
-          "weights": { "spellPower": 1.0, "int": 0.45, "spi": 0.1, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 3.5, "sta": 0.06 },
-          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+          "weights": { "spellPower": 1.0, "int": 0.45, "spi": 0.1, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 3.5, "sta": 0.06 }
         }
       ]
     },
@@ -291,18 +287,15 @@
       "specs": [
         {
           "id": "destruction", "name": "Destruction", "role": "dps", "school": "fire", "weaponStyle": "stats",
-          "weights": { "spellPower": 1.0, "int": 0.32, "spi": 0.08, "spellHit": 14, "spellCrit": 12, "spellPen": 0.3, "mp5": 2.0, "sta": 0.08 },
-          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+          "weights": { "spellPower": 1.0, "int": 0.32, "spi": 0.08, "spellHit": 14, "spellCrit": 12, "spellPen": 0.3, "mp5": 2.0, "sta": 0.08 }
         },
         {
           "id": "affliction", "name": "Affliction", "role": "dps", "school": "shadow", "weaponStyle": "stats",
-          "weights": { "spellPower": 1.0, "int": 0.32, "spi": 0.1, "spellHit": 16, "spellCrit": 8, "spellPen": 0.35, "mp5": 2.0, "sta": 0.08 },
-          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+          "weights": { "spellPower": 1.0, "int": 0.32, "spi": 0.1, "spellHit": 16, "spellCrit": 8, "spellPen": 0.35, "mp5": 2.0, "sta": 0.08 }
         },
         {
           "id": "demonology", "name": "Demonology", "role": "dps", "school": "shadow", "weaponStyle": "stats",
-          "weights": { "spellPower": 1.0, "int": 0.34, "spi": 0.1, "spellHit": 14, "spellCrit": 9, "spellPen": 0.3, "mp5": 2.0, "sta": 0.12 },
-          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+          "weights": { "spellPower": 1.0, "int": 0.34, "spi": 0.1, "spellHit": 14, "spellCrit": 9, "spellPen": 0.3, "mp5": 2.0, "sta": 0.12 }
         }
       ]
     },
@@ -322,13 +315,11 @@
       "specs": [
         {
           "id": "balance", "name": "Balance", "role": "dps", "school": "arcane", "weaponStyle": "stats",
-          "weights": { "spellPower": 1.0, "int": 0.33, "spi": 0.1, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 2.5, "sta": 0.06 },
-          "caps": { "spellHit": { "cap": 10, "postCapWeight": 0 } }
+          "weights": { "spellPower": 1.0, "int": 0.33, "spi": 0.1, "spellHit": 14, "spellCrit": 11, "spellPen": 0.3, "mp5": 2.5, "sta": 0.06 }
         },
         {
           "id": "feral", "name": "Feral (Cat)", "role": "dps", "weaponStyle": "stats",
-          "weights": { "str": 2.0, "agi": 1.9, "sta": 0.15, "ap": 1.0, "apFeral": 1.0, "crit": 25, "hit": 33, "int": 0.05 },
-          "caps": { "hit": { "cap": 9, "postCapWeight": 2 } }
+          "weights": { "str": 2.0, "agi": 1.9, "sta": 0.15, "ap": 1.0, "apFeral": 1.0, "crit": 25, "hit": 33, "int": 0.05 }
         },
         {
           "id": "guardian", "name": "Feral (Bear)", "role": "tank", "weaponStyle": "stats",
@@ -336,7 +327,7 @@
         },
         {
           "id": "restoration", "name": "Restoration", "role": "healer", "school": "nature", "weaponStyle": "stats",
-          "weights": { "healPower": 1.0, "spellPower": 0.55, "int": 0.4, "spi": 0.18, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
+          "weights": { "healPower": 1.0, "spellPower": 1.0, "int": 0.4, "spi": 0.18, "mp5": 6.5, "spellCrit": 8, "sta": 0.06 }
         }
       ]
     }

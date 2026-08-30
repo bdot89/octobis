@@ -268,8 +268,8 @@ export function renderGuide(data, config, character, cls, spec, phase, gear, tal
           : '<p class="muted">Hit is exactly at the cap for this target. Spend everything else on throughput.</p>'}
 
       <p class="panel-note">
-        Caps assume a level 60 with 300 weapon skill. Hit above a cap is worth nothing at all, which
-        is why surplus is treated as a dead stat when ranking swaps.
+        Caps assume a level 60 at ${profile.weaponSkill} weapon skill. Hit above a cap is worth
+        nothing at all, which is why surplus is treated as a dead stat when ranking swaps.
       </p>`}
     </div>`;
 }

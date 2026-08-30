@@ -222,7 +222,7 @@
     "Zandalar Tribe": 1,
     "Brood Of Nozdormu": 4,
     "Cenarion Circle": 4,
-    "Wardens of Time": 4
+    "Wardens of Time": 0
   },
 
   "_atlasSetPhaseComment": [
@@ -256,15 +256,28 @@
     "Keep this to items worth planning around - the level 60 class weapons and the well-known quest",
     "chains. Anything a boss actually drops is found without help."
   ],
+  "_questItemPhaseComment": [
+    "A bare name means the item is available at launch. Naming it here is what places it: several",
+    "of these arrive carrying only a craft source and none carries a quest one, so nothing else in",
+    "the pipeline can phase them, and they end up visible in no phase at all.",
+    "",
+    "Use the object form for the ones that are not launch content. Without it the endgame legendaries",
+    "would be dragged into the launch planner alongside the rest."
+  ],
+
   "questItems": [
     "Benediction", "Anathema",
     "Rhok'delar, Longbow of the Ancient Keepers", "Lok'delar, Stave of the Ancient Keepers",
-    "Quel'Serrar", "Verigan's Fist", "Corrupted Ashbringer",
-    "Thunderfury, Blessed Blade of the Windseeker", "Sulfuras, Hand of Ragnaros",
+    "Quel'Serrar", "Verigan's Fist",
+    "Onyxia Tooth Pendant",
     "The Eye of Divinity", "The Eye of Shadow",
     "Hand of Edward the Odd", "Nightfall", "Azuresong Mageblade",
     "Lok'amir il Romathis", "Fang of the Mystics", "Ironfoe",
-    "Sceptre of Celebras", "Ace of Beasts", "Draconic for Dummies"
+    "Sceptre of Celebras", "Ace of Beasts", "Draconic for Dummies",
+    "Sulfuras, Hand of Ragnaros",
+
+    { "name": "Thunderfury, Blessed Blade of the Windseeker", "phase": 2 },
+    { "name": "Corrupted Ashbringer", "phase": 6 }
   ],
 
   "_craftingComment": [

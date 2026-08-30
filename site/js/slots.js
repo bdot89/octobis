@@ -53,6 +53,9 @@ export function siblingSlots(key) {
 /** Scoring context: weapon damage only counts in a hand, and only a ranged weapon shoots. */
 export function contextFor(slot) {
   if (slot.ranged) return 'ranged';
+  // An off-hand swing deals half damage in 1.12, so its weapon dps is worth half a main hand's.
+  // Scoring both hands at full value overrated every off-hand weapon for warriors and rogues.
+  if (slot.weapon === 'off') return 'offhand';
   if (slot.weapon) return 'melee';
   return 'armor';
 }

@@ -75,10 +75,10 @@ The overlap-prone sentences are pinned by tests of their own.
 
 ### How auto-fill handles hit
 
-Hit cannot be ranked like an ordinary stat. It is a requirement with a hard ceiling: below the cap
-you are missing attacks outright, above it every point is dead. A weight high enough to reach the cap
-overvalues hit in every other slot, and a weight low enough to be fair leaves the set short. So the
-cap is treated as a constraint and the set is built in three passes:
+Hit cannot be ranked like an ordinary stat. It is a requirement with a ceiling: below the cap you
+are missing attacks outright, above it a point is worth little or nothing. A weight high enough to
+reach the cap overvalues hit in every other slot, and a weight low enough to be fair leaves the set
+short. So the cap is treated as a constraint and the set is built in three passes:
 
 1. **Greedy** — the best item per slot, with hit past the cap valued at nothing.
 2. **Gap pass** — buy the hit still missing, cheapest first, ranked by score given up per point of
@@ -90,6 +90,17 @@ A spec that puts no weight on hit gets no budget and skips all three passes. Hea
 miss, so a Restoration shaman needs none — and the gap pass, which buys hit until the cap is met,
 has no way to know that on its own. It bought 16% spell hit and spent a healer's gear on it, leaving
 121 healing power where the same slots now hold 480.
+
+The **BiS List tab uses the same budget**, so the two tabs agree. They did not: `config/specs.json`
+carried a per-item `caps` block for every spec, and a cap is a property of a set rather than an item
+- no single item carries 8% hit or 100 defense - so all 23 of them were unreachable. The list ranked
+with no hit awareness at all while the planner had a budget, and Beast Mastery's Launch list totalled
+18% hit against an 8% cap. The caps are gone; hit lives in one place now.
+
+**Dual wielders are not capped at the yellow cap.** White swings carry a further penalty and need
+around 28%, so hit past the yellow cap keeps real value for Fury, Combat, Assassination and
+Subtlety - it is worth less, not nothing. A single cliff threw that away. Their lists now settle
+above the yellow cap and below the white one.
 
 Talents and enchants are counted before a single item is chosen, so the gear only shops for the
 remainder. Where the cap cannot be reached at all — 16% spell hit does not exist in Launch-phase
@@ -346,6 +357,46 @@ the whole site without re-scraping.
 proc and on-use effects, weapon-speed breakpoints. It can pin an item to a slot, exclude one
 entirely, add a score bonus, or attach a note. Anything carrying an override is badged **adjusted**
 in the UI so the reasoning stays visible.
+
+## The Shaman review
+
+An external review (2026-08-29, against `93401ff`) checked the weights and the engine against the
+live database, a server-core snapshot, and 111 raid scans of real characters. Almost all of it was
+right, and the fixes are in. The parts worth carrying forward:
+
+**The melee hit cap here is 8% at 300 weapon skill, not vanilla's 9%** — measured, not argued.
+Vanilla suppresses the first 1% of hit while the target's defense exceeds your weapon skill by more
+than 10; OctoWoW removed the suppression. 507 boss swings at exactly 8% produced zero misses, where
+9% predicts about five. The weapon-skill quest is therefore worth 2%, not 3%.
+
+**A shield's "53 Block" is block value, not block chance.** Both landed in the same key, so shields
+were priced at roughly five times their worth and every tank auto-fill picked whichever shield had
+the biggest number printed on it.
+
+**Defense was weighted at 40 a point.** Priced by the tank specs' own dodge, parry, block and miss
+weights it is about 6, and at 40 it decided most of a tank set: a +7 defense green outscored a raid
+chest's armour and stamina combined. Warrior and Paladin carried the same number.
+
+**Shamans parry, and cannot dual-wield.** Both were wrong in `specs.json` — no parry weight on the
+tank spec, and Enhancement set to `dualwield` although Dual Wield is taught only by Warrior, Rogue
+and Hunter trainers here. Enhancement is one-hander plus shield or a held off-hand item, which is
+what `onehandoffhand` now means.
+
+**Healers under-valued "+damage and healing" by 45%.** The scraper files it under `spellPower`, and
+every healer weighted that 0.55 against `healPower` 1.0 — but in 1.12 both add the same amount to a
+heal. Healer `spellPower` is now 1.0.
+
+Two findings are **not fixed, because the data is not here to fix them with**:
+
+- **273 of 737 items real raiders wear are not in the index** (37%), chiefly PvP insignia, battleground
+  reputation rings, level-60 quest rewards and the PvP armour sets — categories the crawl skips by
+  design rather than by accident. Closing that needs a worn-gear census to seed from; the review had
+  one, this repo does not. Anyone building such a seed must first drop item ids ≥ 100000, which on
+  this server are transmog artefacts rather than items.
+- **Per-encounter and per-role profiles.** The review's closing argument is that one weight set per
+  spec answers "best for what?" with "on average", and that a tank actually runs several sets
+  (mitigation, threat, resistance) and swaps weapons mid-fight. That is true and it is a redesign,
+  not a fix. What this repo does today is single-target boss gearing, unbuffed, one profile per spec.
 
 ## Known limitations
 

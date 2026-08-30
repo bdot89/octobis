@@ -6,9 +6,9 @@
 // thing a gear planner can tell someone, which is why it gets its own view.
 
 import { scoreItem } from './score.js';
-import { candidatesFor } from './equipped.js';
+import { candidatesFor, allowedByStyle } from './equipped.js';
 import { appliedHit } from './enchants.js';
-import { ALL_SLOTS, contextFor, slotByKey } from './slots.js';
+import { ALL_SLOTS, contextFor, slotByKey, isTwoHanded } from './slots.js';
 
 /** Which of the two caps a spec actually gears for. */
 export function hitKindFor(spec) {
@@ -235,6 +235,11 @@ export function bestHitUpgrades(data, character, spec, classDef, phaseId, overri
   const upgrades = [];
 
   for (const slot of ALL_SLOTS) {
+    // The advice has to be as legal as auto-fill's own picks. Without these it proposed an off
+    // hand to someone holding a two-hander, a two-hander to a Protection warrior, and the same
+    // ring for both fingers.
+    if (slot.key === 'offhand' && isTwoHanded(data.byId.get(gear.mainhand))) continue;
+
     const equippedId = gear[slot.key];
     const equipped = equippedId ? data.byId.get(equippedId) : null;
     const currentHit = equipped?.stats?.[statKey] ?? 0;
@@ -242,6 +247,7 @@ export function bestHitUpgrades(data, character, spec, classDef, phaseId, overri
     const candidates = candidatesFor(data, character, spec, classDef, phaseId, slot.key, overrides)
       .filter(c => (c.item.stats?.[statKey] ?? 0) > currentHit
                    && c.item.id !== equippedId
+                   && allowedByStyle(slot, c.item, spec)
                    && !Object.values(gear).includes(c.item.id));
 
     if (candidates.length === 0) continue;

@@ -62,18 +62,12 @@
       "bonus": { "19406": 100 },
       "note": { "19406": "Drake Fang Talisman - strong while still under the hit cap." }
     },
-    "paladin.retribution": {
-      "bonus": { "19406": 120 },
-      "note": { "19406": "Drake Fang Talisman - strong while still under the hit cap." }
-    },
-    "shaman.enhancement": {
-      "bonus": { "19406": 120 },
-      "note": { "19406": "Drake Fang Talisman - strong while still under the hit cap." }
-    },
-    "druid.feral": {
-      "bonus": { "19406": 120 },
-      "note": { "19406": "Drake Fang Talisman - strong while still under the hit cap." }
-    },
+    "_duplicateKeyWarning": [
+      "One block per scope. A second block with the same key does not merge - JSON keeps the last",
+      "one and the first is silently discarded, which is how the Drake Fang Talisman bonuses for",
+      "shaman.enhancement, paladin.retribution and druid.feral stopped applying when the relic",
+      "rankings were added below. Both sets of entries now live in the single block for each."
+    ],
 
     "warrior.protection": {
       "note": {
@@ -107,8 +101,9 @@
       }
     },
     "shaman.enhancement": {
-      "bonus": { "33089": 30, "61204": 25, "61292": 20 },
+      "bonus": { "33089": 30, "61204": 25, "61292": 20, "19406": 120 },
       "note": {
+        "19406": "Drake Fang Talisman - strong while still under the hit cap.",
         "33089": "Totem of Thundercall - the Stormstrike totem, and Stormstrike is the rotation.",
         "61204": "Totem of the Stonebreaker - 130 attack power on a 35% shock proc (Phase 3)."
       }
@@ -143,8 +138,10 @@
       }
     },
     "paladin.retribution": {
-      "bonus": { "33087": 30, "58240": 20, "55110": 15 },
+      "bonus": { "33087": 30, "58240": 20, "55110": 15, "19406": 120, "17069": 90 },
       "note": {
+        "19406": "Drake Fang Talisman - the hit is worth far more than its raw stats suggest for any spec still under the hit cap.",
+        "17069": "Striker's Mark - stat stick plus a strong ranged attack power contribution.",
         "33087": "Libram of Ardour - more Seal of Command triggers is more of your damage.",
         "58240": "Libram of Final Judgement - execute-range Judgement damage."
       }
@@ -158,8 +155,9 @@
       }
     },
     "druid.feral": {
-      "bonus": { "22397": 30, "61699": 20, "55082": 15 },
+      "bonus": { "22397": 30, "61699": 20, "55082": 15, "19406": 120 },
       "note": {
+        "19406": "Drake Fang Talisman - strong while still under the hit cap.",
         "22397": "Idol of Ferocity - 3 energy off Claw and Rake, which is the cat rotation.",
         "61699": "Idol of Savagery - faster Rake and Rip ticks."
       }

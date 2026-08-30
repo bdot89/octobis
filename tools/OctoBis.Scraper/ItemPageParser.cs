@@ -435,7 +435,12 @@ public static partial class ItemPageParser
         ["Defense"] = "defense",
         ["Dodge"] = "dodge",
         ["Parry"] = "parry",
-        ["Block"] = "block",
+        // A shield's base line reads "53 Block", and that is block value - the amount absorbed -
+        // not a percentage chance. "Improves your chance to block attacks with a shield by 3%" is
+        // the chance, and it goes through the effect patterns to the `block` key. Filing the base
+        // line under `block` too priced 53 as 53% and made every tank auto-fill pick whichever
+        // shield had the biggest number printed on it.
+        ["Block"] = "blockValue",
         ["Fire Resistance"] = "resFire",
         ["Frost Resistance"] = "resFrost",
         ["Nature Resistance"] = "resNature",
@@ -481,7 +486,14 @@ public static partial class ItemPageParser
         // Atiesh for its "+420 Attack Power in Cat, Bear, and Dire Bear forms only". It gets its own
         // key so only the specs that actually fight in a form weight it.
         (new(@"\+(?<v>\d+) Attack Power in [^.]*forms? only", RegexOptions.IgnoreCase), "apFeral", 1),
+        // The database writes ranged attack power as "+19 ranged Attack Power." - no pattern
+        // matched it, so no item in the database carried `rap` and every hunter scored it as zero.
+        // Must precede the plain Attack Power rule, which would otherwise never see the word.
+        (new(@"\+(?<v>\d+) ranged Attack Power", RegexOptions.IgnoreCase), "rap", 1),
         (new(@"\+(?<v>\d+) Attack Power", RegexOptions.IgnoreCase), "ap", 1),
+        // "+5 All Resistances." on an Equip line. score.js expands resAll into the five schools,
+        // and that expansion was dead code because nothing ever set the key.
+        (new(@"\+(?<v>\d+) All Resistances", RegexOptions.IgnoreCase), "resAll", 1),
         (new(@"Restores (?<v>\d+) mana per 5 sec", RegexOptions.IgnoreCase), "mp5", 1),
         // Health regeneration is recognised so it stops showing up as an unmatched line; no spec
         // weights it, so it is carried but never scored.

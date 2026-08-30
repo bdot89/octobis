@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-29T20:18:15.1677493Z",
+  "generated": "2026-08-30T05:56:57.0822261Z",
   "databaseUrl": "https://octowow.st/db/",
   "counts": {
     "items": 4013,
@@ -12,19 +12,19 @@
     "abandonedSlowPages": 0,
     "retries": 0,
     "cacheHits": 10515,
-    "networkFetches": 0
+    "networkFetches": 1
   },
   "itemsPerPhase": {
-    "0": 2950,
+    "0": 2974,
     "1": 142,
-    "2": 220,
+    "2": 221,
     "3": 32,
-    "4": 306,
+    "4": 289,
     "6": 183,
     "7": 87,
-    "unknown": 93
+    "unknown": 85
   },
-  "itemsWithUnknownPhase": 256,
+  "itemsWithUnknownPhase": 248,
   "craftSourcesRephased": 0,
   "atlas": {
     "itemsFromAtlas": 7505,
@@ -361,6 +361,7 @@
       "Ostarius of Uldum"
     ],
     "itemNames": [
+      "Onyxia Tooth Pendant",
       "Sceptre of Celebras"
     ],
     "unnamedZoneIds": [
@@ -388,8 +389,8 @@
     ]
   },
   "unmatchedTooltipLines": {
-    "total": 1455,
-    "distinct": 960,
+    "total": 1425,
+    "distinct": 946,
     "top": {
       "This Item Begins a Quest": 72,
       "Use: Adds a mount to the player\u0027s mount collection.": 69,
@@ -399,9 +400,7 @@
       "Equip: Increases your effective stealth level by 1.": 9,
       "Use: Combines with Gri\u0027lek\u0027s Blood, Renataki\u0027s Tooth, Wushoolay\u0027s Mane, and Hazza\u0027rah\u0027s Dream Thread to form a powerful charm.": 9,
       "Equip: Allows underwater breathing.": 7,
-      "Equip: \u002B5 All Resistances.": 7,
       "16 Slot Bag": 6,
-      "Equip: \u002B17 ranged Attack Power.": 6,
       "Use: Opens a Stratholme postbox.": 6,
       "Use: Returns you to the sanctuary of Dun Baldar.": 6,
       "Use: Returns you to the sanctuary of Frostwolf Keep.": 6,
@@ -429,10 +428,8 @@
       "Chance on hit: Wounds the target for 75 damage.": 3,
       "\u0022Dark runes skitter across the surface.\u0022": 3,
       "Equip: Increases damage done to Undead by magical spells and effects by up to 35.": 3,
-      "Equip: \u002B22 ranged Attack Power.": 3,
       "Chance on hit: Sends a shadowy bolt at the enemy causing 35 Shadow damage.": 3,
       "Chance on hit: Punctures target\u0027s armor lowering it by 100.": 3,
-      "Equip: \u002B19 ranged Attack Power.": 3,
       "Equip: When struck in combat inflicts 3 Nature damage to the attacker.": 3,
       "Equip: Increased Two-handed Axes \u002B7.": 3,
       "Equip: Increases ranged attack speed by 15%.": 3,
@@ -470,7 +467,11 @@
       "Equip: Adds 3 Lightning damage to your melee attacks.": 2,
       "Equip: Increased Daggers \u002B7.": 2,
       "Chance on hit: Disarm target\u0027s weapon for 5 sec.": 2,
-      "Chance on hit: Blasts a target for 10 to 21 Nature damage.": 2
+      "Chance on hit: Blasts a target for 10 to 21 Nature damage.": 2,
+      "Chance on hit: Increases your attack speed by 20% for 10 sec.": 2,
+      "Chance on hit: Corrupts the target, causing 210 damage over 3 sec.": 2,
+      "Chance on hit: Steals 141 to 164 life from target enemy.": 2,
+      "Equip: Adds 4 fire damage to your weapon attack.": 2
     }
   }
 }

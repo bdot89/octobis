@@ -698,6 +698,18 @@ public sealed class Crawler
             // Blessed Qiraji weapons, the Shifting Sands jewellery. Letting the rule reach them put
             // a Naxxramas legendary in the launch planner and had 101 class/spec/phase combinations
             // equipping it. They stay unknown until something can phase them properly.
+            // Items named in phases.json questItems are vouched for by hand, and the naming is the
+            // evidence: they take their configured phase whatever their sources look like. The
+            // source-kind test below cannot see them - Benediction and Rhok'delar arrive carrying
+            // only a craft source, and none of them carries a quest one - so they sat at no phase
+            // and appeared nowhere at all.
+            if (_config.QuestItemPhases.TryGetValue(item.Name, out var namedPhase))
+            {
+                item.MinPhase = namedPhase;
+                _report.QuestRewardsPhasedAtLaunch++;
+                continue;
+            }
+
             if (item.Quality < 4
                 && _sources.TryGetValue(item.Id, out var itemSources)
                 && itemSources.Any(s => s.Kind == SourceKind.Quest))
@@ -901,6 +913,10 @@ public sealed class Config
     public Dictionary<string, List<string>> CraftedItems { get; init; } = new();
     public List<string> QuestItems { get; init; } = new();
 
+    /// <summary>Phase for each named quest item; launch unless the config says otherwise.</summary>
+    public Dictionary<string, int> QuestItemPhases { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+
+
     /// <summary>Set-name prefix -> phase, longest prefix wins. From config's atlasSetPhases.</summary>
     public Dictionary<string, int> SetPhases { get; } = new(StringComparer.OrdinalIgnoreCase);
 
@@ -975,15 +991,37 @@ public sealed class Config
                 if (int.TryParse(entry.Name, out var zoneId))
                     overrides[zoneId] = entry.Value.GetString() ?? "";
 
-        var questItems = root.TryGetProperty("questItems", out var questElement) && questElement.ValueKind == JsonValueKind.Array
-            ? questElement.EnumerateArray().Select(v => v.GetString() ?? "").Where(s => s.Length > 0).ToList()
-            : new List<string>();
+        // A quest item is either a bare name, meaning available at launch, or an object with a phase
+        // for the ones that are not - Thunderfury needs Blackwing Lair, the Corrupted Ashbringer
+        // needs Naxxramas. Naming an item is the evidence that places it; without a phase the
+        // endgame ones would be dragged to launch along with the rest.
+        var questItems = new List<string>();
+        var questItemPhases = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        if (root.TryGetProperty("questItems", out var questElement) && questElement.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var entry in questElement.EnumerateArray())
+            {
+                var name = entry.ValueKind == JsonValueKind.Object
+                    ? entry.TryGetProperty("name", out var n) ? n.GetString() ?? "" : ""
+                    : entry.GetString() ?? "";
+
+                if (name.Length == 0) continue;
+
+                questItems.Add(name);
+                questItemPhases[name] = entry.ValueKind == JsonValueKind.Object
+                                        && entry.TryGetProperty("phase", out var p) && p.TryGetInt32(out var phase)
+                    ? phase
+                    : 0;
+            }
+        }
 
         var config = new Config
         {
             Phases = phases,
             CraftedItems = crafted,
             QuestItems = questItems,
+            QuestItemPhases = questItemPhases,
             ZoneUnits = zoneUnits,
             ZoneIdOverrides = overrides
         };
