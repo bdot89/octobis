@@ -256,6 +256,37 @@ Descriptions interpolate per-rank values through nested components, which is why
 only top-level elements and substitutes a component's `values` array as "1/2/3". A handful of
 talents defer their value to a separate payload chunk; those render a `?` rather than a wrong number.
 
+### Suggested talent builds
+
+The Talents tab offers a build for the current spec, from `config/builds.json`, with a one-click
+apply.
+
+**These are not usage statistics, and the panel says so.** The obvious way to answer "what do people
+actually play" is to read logs or an armory, and OctoWoW has neither: `/armory` returns 403, no log
+aggregator covers the server, and the per-class forums carry bug reports and balance suggestions
+rather than build guides - the entire Shaman forum has one. The server is also only weeks old, so no
+third-party site has accumulated data on it either. A popularity figure would have to be invented,
+and an invented number that reads as measured is worse than no number.
+
+What they are instead: the settled Vanilla 1.12 and Turtle WoW build for each spec, translated onto
+OctoWoW's trees. The translation is the substance of the work, because the trees genuinely differ -
+Stormstrike is a single fifth-tier point rather than a 30-point capstone, Elemental Devastation
+grants hit instead of crit, and Master Strike, Ancestral Guardian, Precision Cut and Blade Rush have
+no vanilla counterpart at all. Each build therefore records:
+
+- `basis` - the vanilla or Turtle build it descends from;
+- `diverges` - the choices that are OctoWoW-specific, shown to the player as prominently as the
+  build itself, because those are the points worth arguing with rather than accepting.
+
+One build is real evidence rather than adaptation: the shaman tank's 12/39/0, taken from a geared
+OctoWoW tank and decoded against the live talent calculator. That same check confirmed the scraped
+tree caps (47/48/48) and every max rank in the build.
+
+Hand-authoring 29 builds of 51 points across altered trees silently produces builds no player could
+train, so `BuildsTests` replays each one under the game's rules - tier requirements, prerequisites
+and rank ceilings - and fails naming the exact point that could not be trained. All 29 also replay
+through the site's own `addPoint`, so a player clicking point by point arrives at the same build.
+
 ### Website crawl
 
 The website still supplies stats, and its own loot data is kept as a supplement for anything Atlas
