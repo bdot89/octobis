@@ -16,11 +16,16 @@ namespace OctoBis.Scraper;
 public sealed partial class AttachmentScraper
 {
     private readonly AowowClient _client;
+    private readonly int[] _extraIds;
 
     public List<string> Warnings { get; } = new();
     public List<string> Unparsed { get; } = new();
 
-    public AttachmentScraper(AowowClient client) => _client = client;
+    public AttachmentScraper(AowowClient client, IEnumerable<int>? extraIds = null)
+    {
+        _client = client;
+        _extraIds = extraIds?.ToArray() ?? Array.Empty<int>();
+    }
 
     public sealed class Attachment
     {
@@ -63,8 +68,11 @@ public sealed partial class AttachmentScraper
         foreach (var term in new[] { "Arcanum", "Signet of", "Presence of Sight", "Syncretist", "Falcon's Call" })
             await CollectItemsAsync(found, term, "enchant", new[] { "head", "legs" });
 
-        foreach (var term in new[] { "of the Scourge", "Inscription of" })
+        foreach (var term in new[] { "of the Scourge", "Inscription of", "Sigil of" })
             await CollectItemsAsync(found, term, "enchant", new[] { "shoulder" });
+
+        // Named by id in the config, so a blocked search endpoint cannot hide them.
+        await CollectByIdAsync(found, "enchant");
 
         return found.Values
             .Where(a => a.Slots.Length > 0)
@@ -111,6 +119,41 @@ public sealed partial class AttachmentScraper
             var page = await _client.GetAsync($"?spell={id}");
             ApplyEffect(attachment, ExtractSpellEffect(page));
             found[id.Value] = attachment;
+        }
+    }
+
+    /// <summary>
+    /// Adds attachments by item id, bypassing the search endpoint entirely.
+    ///
+    /// Search is the weak link here: the database answers it with a bot-protection page often
+    /// enough that a term coming back empty proves nothing. The Hyjal shoulder sigils were missing
+    /// for exactly that reason - a search for "Zandalar Signet", which certainly exists, was coming
+    /// back empty at the same time. Item pages fetch reliably, so anything whose id is known is
+    /// fetched directly, and `config/enchants.json` carries the list.
+    /// </summary>
+    private async Task CollectByIdAsync(Dictionary<int, Attachment> found, string kind)
+    {
+        foreach (var id in _extraIds)
+        {
+            if (found.ContainsKey(id)) continue;
+
+            var page = await _client.GetItemPageAsync(id);
+            if (string.IsNullOrEmpty(page)) { Unparsed.Add($"item {id}: page not fetched"); continue; }
+
+            var name = AttachmentNameRegex().Match(page) is { Success: true } m
+                ? System.Net.WebUtility.HtmlDecode(m.Groups[1].Value).Trim()
+                : "";
+            if (name.Length == 0) { Unparsed.Add($"item {id}: no name on page"); continue; }
+
+            var effect = ExtractItemEffect(page);
+            if (effect is null) { Unparsed.Add($"{name} ({id}): no effect line"); continue; }
+
+            var slots = SlotsFromEffect(effect);
+            if (slots is null) { Unparsed.Add($"{name} ({id}): effect names no slot - {effect}"); continue; }
+
+            var attachment = new Attachment { Id = id, Kind = kind, Name = name, Slots = slots };
+            ApplyEffect(attachment, effect);
+            found[id] = attachment;
         }
     }
 
@@ -376,7 +419,7 @@ public sealed partial class AttachmentScraper
         // Continuations of the same list: "adds 24 Ranged Attack Power, 10 Stamina, and 1% ...".
         // Only the first entry follows the word "adds", so the rest need their own pattern.
         (new(@",\s*(?<v>\d+)\s+(?<stat>[A-Za-z][A-Za-z ]{1,22}?)(?=\s*(?:,|\.|$)|\s+and\s|\s+to\s+a\s)", RegexOptions.IgnoreCase), "statWord"),
-                (new(@"adds\s+\+?(?<v>[\d.]+)% (?<stat>dodge|haste|parry|block)", RegexOptions.IgnoreCase), "statWord"),
+                (new(@"adds\s+\+?(?<v>[\d.]+)% (?<stat>dodge|haste|parry|block|vampirism|crit|hit)", RegexOptions.IgnoreCase), "statWord"),
         // "Permanently adds +8 to your Healing and Damage from spells"
         (new(@"adds\s+\+?(?<v>\d+) to your healing and damage from spells", RegexOptions.IgnoreCase), "spellPower"),
         // "Permanently adds 18 to all healing and damage spells"
@@ -432,6 +475,7 @@ public sealed partial class AttachmentScraper
                     RegexOptions.IgnoreCase)]
     private static partial Regex ProcRegex();
 
+    [GeneratedRegex(@"<b class=""q\d"">([^<]+)</b>")] private static partial Regex AttachmentNameRegex();
     [GeneratedRegex(@"Permanently[^<]{10,220}")] private static partial Regex SpellEffectRegex();
     [GeneratedRegex(@"Use:\s*(.{0,300}?)</span>", RegexOptions.Singleline)] private static partial Regex ItemUseRegex();
 }

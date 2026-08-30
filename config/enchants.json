@@ -12,5 +12,23 @@
     "Proc and timed effects are already excluded by the scraper and shown as unscored, so they do",
     "not need entries here."
   ],
+  "_alsoIncludeComment": [
+    "Attachments fetched by item id rather than found by search.",
+    "",
+    "The scraper finds most enchants by searching the database, and search is the weak link: it",
+    "answers with a bot-protection page often enough that a term coming back empty proves nothing.",
+    "A search for 'Zandalar Signet' - which certainly exists - returned nothing on the same run that",
+    "missed these. Item pages fetch reliably, so anything named here is fetched directly.",
+    "",
+    "Add an id and the next --attachments run picks it up: the name, effect wording, slot and stats",
+    "all come off the item's own page. The 'name' here is only a comment for the reader."
+  ],
+
+  "alsoInclude": [
+    { "id": 61436, "name": "Sigil of Leeching - Hyjal, +2% vampirism to a shoulder slot item" },
+    { "id": 61437, "name": "Sigil of Quickness - Hyjal, +2% haste to a shoulder slot item" },
+    { "id": 61438, "name": "Sigil of Penetration - Hyjal, +40 armor penetration to a shoulder slot item" }
+  ],
+
   "stats": {}
 }

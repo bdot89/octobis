@@ -40,7 +40,7 @@ training and untraining.
 Every slot that can take something carries a line under it. These are **not phase-gated** — anything
 you can apply is offered in every phase.
 
-`--attachments` scrapes all three kinds straight from the database: **227 enchants, 28 jewelcrafting
+`--attachments` scrapes all three kinds straight from the database: **230 enchants, 28 jewelcrafting
 gems and 10 belt buckles**. Gems go on rings and amulets ("Permanently enchant a ring or amulet"),
 buckles on the waist, and the head, shoulder and leg enchants — which are reputation items rather
 than enchanting recipes — come in by name alongside the rest.
@@ -49,6 +49,13 @@ The slot comes from the effect wording, and the wording is the only thing that k
 signets say "adds to a shoulder slot item", and without a case for that they fell back to the search
 term's guess and were filed as head and leg enchants. The shoulder slot took no enchant at all,
 since it was missing from the list of enchantable slots.
+
+**Search is the weak link, so anything important can be named by id.** The database answers search
+with a bot-protection page often enough that a term returning nothing proves nothing — a search for
+"Zandalar Signet", which certainly exists, came back empty on the same run that missed the Hyjal
+shoulder sigils. Item pages fetch reliably, so `alsoInclude` in `config/enchants.json` lists ids to
+fetch directly; name, effect, slot and stats all come off the item's own page. Add an id and the
+next `--attachments` run picks it up.
 
 Stats are **parsed from the database's own effect wording**, not hand-curated: a spell page reads
 "Permanently enchant gloves to increase agility by 15" and that becomes `{ agi: 15 }`. Anything the

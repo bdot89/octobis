@@ -151,7 +151,25 @@ if (ParseString(args, "--atlas-report") is { } atlasRoot)
 if (args.Contains("--attachments"))
 {
     Console.WriteLine("Scraping enchants, buckles and gems...");
-    var attachmentScraper = new AttachmentScraper(client);
+    // Attachments the search endpoint cannot be relied on to surface are named by id in the config.
+    var enchantConfigPath = Path.Combine(configDir, "enchants.json");
+    var extraIds = new List<int>();
+    if (File.Exists(enchantConfigPath))
+    {
+        using var enchantConfig = JsonDocument.Parse(await File.ReadAllTextAsync(enchantConfigPath));
+        if (enchantConfig.RootElement.TryGetProperty("alsoInclude", out var alsoInclude)
+            && alsoInclude.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var entry in alsoInclude.EnumerateArray())
+            {
+                if (entry.ValueKind == JsonValueKind.Object && entry.TryGetProperty("id", out var idElement)
+                    && idElement.TryGetInt32(out var id)) extraIds.Add(id);
+                else if (entry.TryGetInt32(out var bare)) extraIds.Add(bare);
+            }
+        }
+    }
+
+    var attachmentScraper = new AttachmentScraper(client, extraIds);
     var attachments = await attachmentScraper.LoadAsync();
 
     var byKind = attachments.GroupBy(a => a.Kind).ToDictionary(g => g.Key, g => g.Count());
