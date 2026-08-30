@@ -4,6 +4,7 @@
 import { esc, statLine, sourceLine, statLabel as label } from './render.js';
 import { iconUrl } from './data.js';
 import { hitProfile, replacementAdvice, bestHitUpgrades } from './hit.js';
+import { weaponSkillPanel } from './weaponskill.js';
 
 function signed(value) {
   return value > 0 ? `+${value}` : `${value}`;
@@ -19,38 +20,7 @@ function itemChip(data, item) {
     </span>`;
 }
 
-function weaponSkillPanel(config, profile, spec) {
-  // Weapon skill does nothing for a caster's spell hit, so it is not worth the space.
-  if (profile.kind !== 'melee') return '';
 
-  const settings = config.weaponSkill ?? {};
-  const trained = profile.weaponSkill >= (settings.max ?? 305);
-  const boss = profile.targets.find(t => t.id === 'boss');
-
-  return `
-    <section class="weapon-skill">
-      <div class="ws-head">
-        <div>
-          <h3>Weapon skill</h3>
-          <p class="muted small">${esc(settings.note ?? '')}</p>
-        </div>
-        <div class="ws-toggle" role="group" aria-label="Weapon skill">
-          <button class="ws-button${trained ? '' : ' is-active'}" type="button"
-                  data-weapon-skill="${settings.base ?? 300}">${settings.base ?? 300}</button>
-          <button class="ws-button${trained ? ' is-active' : ''}" type="button"
-                  data-weapon-skill="${settings.max ?? 305}">${settings.max ?? 305}</button>
-        </div>
-      </div>
-      <p class="ws-why">
-        ${trained
-          ? `Counting the quest reward. Against bosses that is <strong>${boss?.weaponSkillSaving ?? 0}% less hit</strong>
-             needed from gear than an untrained character.`
-          : `Not counting the quest. Completing it would cut the hit you need against bosses by
-             <strong>${boss?.weaponSkillSaving ?? 0}%</strong> — more than any single item gives you.`}
-      </p>
-      <p class="muted small">${esc(settings.questName ?? '')}</p>
-    </section>`;
-}
 
 /**
  * A target card leads with the figure a player actually shops against: how much hit gear has to
@@ -251,7 +221,7 @@ export function renderGuide(data, config, character, cls, spec, phase, gear, tal
             reach. Any hit on your gear is doing nothing — spend the budget on healing, mana and
             survivability instead. Auto-fill ignores hit entirely for this spec.</p>`
         : `
-      ${weaponSkillPanel(config, profile, spec)}
+      ${weaponSkillPanel(config, profile)}
 
       <div class="hit-cards">${profile.targets.map(t => targetCard(t, profile)).join('')}</div>
 

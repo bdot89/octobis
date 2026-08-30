@@ -35,6 +35,13 @@ shows a different set rather than overwriting the first. The **Talents** tab is 
 with vanilla's rules enforced: 51 points, five points per tier, and prerequisites that block both
 training and untraining.
 
+The planner shows the loadout's **talents** underneath the stat totals — the spread, the points
+still unspent, and every talent trained with its rank. Talents change what the gear has to supply,
+so having to change tabs to remember whether you took Shadow Focus made the totals above them look
+arbitrary. The **weapon skill** toggle sits there too: it is a control you reach for while building
+a set, because flipping it changes what auto-fill goes shopping for. Both also appear, in fuller
+form, on Hit Values.
+
 ### Enchants, buckles and gems
 
 Every slot that can take something carries a line under it. These are **not phase-gated** — anything
@@ -142,7 +149,7 @@ and items reference it by index; set blocks are stored once per set rather than 
 Without that the file would be 1.5 MB instead of 1.1 MB. Gzipped, the whole tooltip feature costs
 about 22 KB on the wire.
 
-### The Guide tab
+### The Hit Values tab
 
 Hit is the one stat with a hard ceiling: below the cap it is usually a spec's best stat, and one
 point above it is worth exactly nothing. The guide shows what you need against players, ordinary

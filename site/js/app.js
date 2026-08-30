@@ -114,9 +114,17 @@ function render() {
 
   if (currentView === 'planner') {
     const enchants = Characters.enchantsFor(character, phaseId);
+    const talents = Characters.talentsFor(character);
     view.innerHTML = renderPlanner(
       data, character, cls, spec, phaseOf(), Characters.gearFor(character, phaseId), overrides,
-      enchants, appliedStats(data.enchantIndex, enchants), talentStatsFor(character, spec));
+      enchants, appliedStats(data.enchantIndex, enchants), talentStatsFor(character, spec),
+      {
+        talents,
+        mode: Characters.activeMode(),
+        profile: hitProfile(
+          data, data.hitcaps, character, spec, Characters.gearFor(character, phaseId), talents,
+          Characters.weaponSkill(character, data.hitcaps.weaponSkill?.base ?? 300), enchants)
+      });
     return;
   }
 

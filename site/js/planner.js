@@ -5,6 +5,8 @@ import { iconUrl } from './data.js';
 import { LEFT_SLOTS, RIGHT_SLOTS, isTwoHanded } from './slots.js';
 import { summarise } from './equipped.js';
 import { ENCHANTABLE, find as findEnchant } from './enchants.js';
+import { treesFor, spentIn, totalSpent, ranksOf, TOTAL_POINTS } from './talents.js';
+import { weaponSkillPanel } from './weaponskill.js';
 
 const QUALITY_CLASS = ['poor', 'common', 'uncommon', 'rare', 'epic', 'legendary'];
 
@@ -50,7 +52,58 @@ function slotCell(data, slot, gear, side, enchants) {
     </div>`;
 }
 
-function summaryPanel(data, character, cls, spec, phase, gear, overrides, enchantStats, talentStats) {
+/**
+ * What the loadout has spent its talent points on.
+ *
+ * The Talents tab is where you build it, but the planner is where you judge gear, and hit talents,
+ * armour multipliers and weapon specialisations all change what the gear has to supply. Having to
+ * switch tabs to remember whether you took Shadow Focus made the totals above look arbitrary.
+ */
+function talentPanel(data, character, build, mode) {
+  const trees = treesFor(data.talents, character.classId);
+  if (trees.length === 0) return '';
+
+  const spent = totalSpent(build);
+  const spread = trees.map(t => spentIn(build, t.index));
+
+  // Everything actually trained, tree by tree, so the panel says what you have and not just how much.
+  const taken = trees.map(tree => ({
+    name: tree.name,
+    points: spentIn(build, tree.index),
+    talents: tree.talents
+      .map(talent => ({ talent, ranks: ranksOf(build, tree.index, talent.cell) }))
+      .filter(entry => entry.ranks > 0)
+      .sort((a, b) => a.talent.row - b.talent.row || a.talent.col - b.talent.col)
+  })).filter(tree => tree.points > 0);
+
+  return `
+    <section class="talent-summary">
+      <div class="ts-head">
+        <h3>Talents <span class="ts-spread">${spread.join(' / ')}</span></h3>
+        <span class="ts-count">${spent} of ${TOTAL_POINTS} spent${
+          spent < TOTAL_POINTS ? ` · <strong>${TOTAL_POINTS - spent} left</strong>` : ''}</span>
+      </div>
+
+      ${taken.length === 0
+        ? `<p class="muted small">No talents in this ${esc(mode === 'pvp' ? 'PvP' : 'PvE')} build yet.
+            The Talents tab builds one, and it is saved per loadout.</p>`
+        : `<div class="ts-trees">
+            ${taken.map(tree => `
+              <div class="ts-tree">
+                <h4>${esc(tree.name)} <span class="ts-points">${tree.points}</span></h4>
+                <ul>
+                  ${tree.talents.map(({ talent, ranks }) => `
+                    <li${ranks >= talent.ranks ? ' class="is-maxed"' : ''}>
+                      <span class="ts-name">${esc(talent.name)}</span>
+                      <span class="ts-rank">${ranks}/${talent.ranks}</span>
+                    </li>`).join('')}
+                </ul>
+              </div>`).join('')}
+           </div>`}
+    </section>`;
+}
+
+function summaryPanel(data, character, cls, spec, phase, gear, overrides, enchantStats, talentStats, extras = '') {
   const summary = summarise(data, gear, spec, overrides, enchantStats, talentStats);
   const filled = summary.equippedCount;
   const total = LEFT_SLOTS.length + RIGHT_SLOTS.length;
@@ -100,14 +153,24 @@ function summaryPanel(data, character, cls, spec, phase, gear, overrides, enchan
         the like are part of your hit, so they are counted here. Base class and race values are not
         in the dataset, so a combined health or mana figure would be mostly invention.
       </p>
+
+      ${extras}
     </div>`;
 }
 
-export function renderPlanner(data, character, cls, spec, phase, gear, overrides, enchants = {}, enchantStats = {}, talentStats = {}) {
+export function renderPlanner(data, character, cls, spec, phase, gear, overrides, enchants = {}, enchantStats = {},
+                              talentStats = {}, context = {}) {
+  // Weapon skill is a control you reach for while building a set - flipping it changes what
+  // auto-fill goes shopping for - so it belongs here as well as on the Hit Values tab.
+  const extras = [
+    context.profile ? weaponSkillPanel(data.hitcaps, context.profile, 'compact') : '',
+    talentPanel(data, character, context.talents ?? {}, context.mode)
+  ].join('');
+
   return `
     <div class="planner">
       <div class="slot-column">${LEFT_SLOTS.map(s => slotCell(data, s, gear, 'left', enchants)).join('')}</div>
-      <div class="planner-centre">${summaryPanel(data, character, cls, spec, phase, gear, overrides, enchantStats, talentStats)}</div>
+      <div class="planner-centre">${summaryPanel(data, character, cls, spec, phase, gear, overrides, enchantStats, talentStats, extras)}</div>
       <div class="slot-column">${RIGHT_SLOTS.map(s => slotCell(data, s, gear, 'right', enchants)).join('')}</div>
     </div>`;
 }

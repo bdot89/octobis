@@ -701,6 +701,52 @@ a:hover { text-decoration: underline; }
 }
 .ws-button.is-active { background: var(--accent-dim); color: var(--accent); }
 .ws-why { margin: 0.55rem 0 0.35rem; font-size: 0.85rem; }
+
+/* The planner carries a trimmed version: the control and one line of consequence, no quest name. */
+.weapon-skill-compact { margin-top: 1rem; padding: 0.7rem 0.85rem; }
+.weapon-skill-compact h3 { font-size: 0.9rem; }
+.weapon-skill-compact .ws-head { align-items: center; }
+.weapon-skill-compact strong { color: var(--accent); }
+
+/* Talents, as read on the planner: what the loadout spent and what it bought. */
+.talent-summary {
+  margin-top: 1rem;
+  padding: 0.8rem 0.9rem;
+  background: var(--bg-row);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.ts-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+.ts-head h3 { margin: 0; font-size: 0.95rem; display: flex; align-items: baseline; gap: 0.5rem; }
+.ts-spread { font-family: ui-monospace, Consolas, monospace; color: var(--accent); font-size: 0.95rem; }
+.ts-count { font-size: 0.8rem; color: var(--text-muted); }
+.ts-count strong { color: var(--accent); font-weight: 600; }
+
+.ts-trees { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.9rem; margin-top: 0.7rem; }
+.ts-tree h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.ts-points { color: var(--accent); font-variant-numeric: tabular-nums; }
+.ts-tree ul { margin: 0; padding: 0; list-style: none; }
+.ts-tree li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.15rem 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+/* A maxed talent is the one you actually rely on, so it reads at full strength. */
+.ts-tree li.is-maxed { color: var(--text); }
+.ts-rank { font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.ts-tree li.is-maxed .ts-rank { color: var(--accent); }
 .ws-why strong { color: var(--accent); }
 
 .hit-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; }
