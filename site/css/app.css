@@ -962,3 +962,72 @@ a:hover { text-decoration: underline; }
   .bis-table thead { display: none; }
   .check-source { padding-left: 0; }
 }
+
+/* ---- Suggested talent build ---------------------------------------------------------------- */
+/* Sits above the trees on the Talents tab. Deliberately reads as advice rather than as data:
+   the provenance line is part of the component, not a footnote, because these builds are adapted
+   from vanilla consensus and are not measured from play on this server. */
+.suggested-build {
+  margin: 0 0 1.1rem;
+  padding: 0.9rem 1rem;
+  background: var(--bg-row);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+}
+.suggested-build.is-applied { border-left-color: var(--border-strong); }
+
+.sb-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+.sb-head h3 { margin: 0 0 0.2rem; font-size: 1rem; display: flex; align-items: baseline; gap: 0.55rem; }
+.sb-spread { font-family: ui-monospace, Consolas, monospace; color: var(--accent); font-size: 0.95rem; }
+.sb-actions { flex-shrink: 0; }
+.sb-applied { font-size: 0.8rem; color: var(--text-muted); }
+
+.sb-provenance {
+  margin: 0.7rem 0 0;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  background: var(--bg-panel);
+  border-radius: var(--radius);
+}
+.sb-provenance strong { color: var(--text); }
+
+.sb-trees { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.9rem; margin-top: 0.8rem; }
+.sb-tree h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.sb-points { color: var(--accent); font-variant-numeric: tabular-nums; }
+.sb-tree ul { margin: 0; padding: 0; list-style: none; }
+.sb-tree li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.15rem 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.sb-tree li.is-maxed { color: var(--text); }
+.sb-rank { font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.sb-tree li.is-maxed .sb-rank { color: var(--accent); }
+
+.sb-diverges { margin-top: 0.85rem; }
+.sb-diverges h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.sb-diverges ul { margin: 0; padding-left: 1.1rem; }
+.sb-diverges li { font-size: 0.8rem; line-height: 1.55; color: var(--text-muted); margin-bottom: 0.3rem; }
+
+.sb-missing { margin: 0.7rem 0 0; font-size: 0.78rem; color: var(--warn, #e0a458); }

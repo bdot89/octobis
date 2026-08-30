@@ -6,6 +6,7 @@ import { renderPlanner, renderWelcome, renderPickerRow } from './planner.js';
 import { buildBis } from './score.js';
 import { candidatesFor, normalise, autoFill } from './equipped.js';
 import { renderTalents, addPoint, removePoint, treesFor } from './talents.js';
+import { suggestedBuild, buildPanel } from './builds.js';
 import { renderGuide } from './guide.js';
 import { hitProfile, talentHit, hitKindFor } from './hit.js';
 import { forSlot as enchantsForSlot, appliedStats, find as findEnchant } from './enchants.js';
@@ -142,8 +143,11 @@ function render() {
   }
 
   if (currentView === 'talents') {
+    const build = Characters.talentsFor(character);
+    const suggestion = suggestedBuild(data.buildConfig, data.talents, character.classId, spec?.id);
     view.innerHTML = renderTalents(
-      data.talents, character.classId, Characters.talentsFor(character), spec);
+      data.talents, character.classId, build, spec,
+      buildPanel(suggestion, build, data.talents, character.classId));
     return;
   }
 
@@ -575,6 +579,15 @@ function wire() {
 
     if (event.target.closest('#reset-talents')) {
       Characters.setTalents(character, {});
+      render();
+      return;
+    }
+
+    if (event.target.closest('[data-apply-build]')) {
+      // Applied wholesale rather than point by point: the suggestion is already checked against
+      // the trees, and replaying it through addPoint would be at the mercy of allocation order.
+      const suggestion = suggestedBuild(data.buildConfig, data.talents, character.classId, specOf(character)?.id);
+      if (suggestion) Characters.setTalents(character, suggestion.build);
       render();
       return;
     }

@@ -142,7 +142,7 @@ function talentCell(talents, classId, build, tree, talent, iconBase, iconExtensi
     </button>`;
 }
 
-export function renderTalents(talents, classId, build, spec) {
+export function renderTalents(talents, classId, build, spec, extras = '') {
   const trees = treesFor(talents, classId);
   if (trees.length === 0) {
     return `<p class="empty">No talent data for this class. Re-run the scraper with
@@ -165,6 +165,8 @@ export function renderTalents(talents, classId, build, spec) {
           <button class="button" type="button" id="reset-talents">Reset</button>
         </div>
       </div>
+      ${extras}
+
 
       <div class="tree-grid">
         ${trees.map(tree => `

@@ -15,6 +15,7 @@ const FILES = {
   races: './config/races.json',
   hitcaps: './config/hitcaps.json',
   enchantConfig: './config/enchants.json',
+  buildConfig: './config/builds.json',
   talents: './data/talents.json',
   enchants: './data/enchants.json'
 };
@@ -118,6 +119,7 @@ export async function loadAll() {
     factions: raw.races.factions,
     talents: raw.talents,
     hitcaps: raw.hitcaps,
+    buildConfig: raw.buildConfig,
     enchantIndex: buildEnchantIndex(raw.enchants, raw.enchantConfig),
     classes,
     slots: raw.slots.slots,

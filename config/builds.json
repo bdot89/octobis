@@ -1,0 +1,640 @@
+{
+  "_comment": [
+    "Suggested talent builds, one per class and spec.",
+    "",
+    "PROVENANCE - read this before trusting a build.",
+    "",
+    "These are NOT usage statistics. OctoWoW publishes no armory (/armory is 403), there is no log",
+    "aggregator that covers it, and the class forums carry bug reports and balance suggestions",
+    "rather than per-spec guides. Nothing on this server measures what people actually play, so a",
+    "'most popular build' figure would have to be invented, and an invented number that looks",
+    "measured is worse than no number at all.",
+    "",
+    "What these are instead: the long-settled Vanilla 1.12 and Turtle WoW build for each spec,",
+    "translated onto OctoWoW's own trees. That translation is real work, because the trees differ.",
+    "Stormstrike is one point here, not the top of a 30-point climb. Elemental Devastation grants",
+    "hit rather than crit. Whole talents - Master Strike, Ancestral Guardian, Precision Cut, Blade",
+    "Rush - have no vanilla counterpart at all.",
+    "",
+    "Each build therefore carries two fields the UI shows the player:",
+    "  'basis'    - the vanilla/Turtle build it descends from.",
+    "  'diverges' - the choices that are OctoWoW-specific, i.e. where tradition ran out and the",
+    "               pick was made from the talent's own text. These are the points most worth",
+    "               arguing with, and the UI marks them.",
+    "",
+    "FORMAT",
+    "",
+    "'points' is keyed by tree name, then by talent name, both exactly as data/talents.json spells",
+    "them. Names rather than cell ids, so this file stays readable and reviewable by a player.",
+    "Duplicate names across trees (shaman Ancestral Knowledge, rogue Throwing Weapon",
+    "Specialization) are unambiguous because the tree name qualifies them.",
+    "",
+    "Every build here is checked by the build tests against the real trees: names must exist, ranks",
+    "must not exceed the maximum, tier requirements and prerequisites must be satisfiable in some",
+    "order, and the total must not exceed 51. A build that fails is a build no player could train."
+  ],
+
+  "builds": {
+    "warrior": {
+      "arms": {
+        "name": "Two-Handed Arms",
+        "basis": "The classic 31/20/0 Mortal Strike build.",
+        "diverges": [
+          "Master of Arms replaces vanilla's per-weapon Axe/Sword/Mace specialisations, so it is taken regardless of weapon type - and it needs one point in Master Strike to unlock.",
+          "Boundless Anger has no vanilla equivalent; three points there are what carry the build up to Mortal Strike's tier."
+        ],
+        "points": {
+          "Arms": {
+            "Improved Heroic Strike": 3, "Tactical Mastery": 5, "Improved Rend": 2,
+            "Improved Overpower": 2, "Deep Wounds": 3, "Master Strike": 1,
+            "Two-Handed Weapon Specialization": 3, "Impale": 2, "Master of Arms": 5,
+            "Sweeping Strikes": 1, "Boundless Anger": 3, "Mortal Strike": 1
+          },
+          "Fury": {
+            "Cruelty": 5, "Booming Voice": 2, "Unbridled Wrath": 5, "Blood Craze": 3, "Enrage": 5
+          }
+        }
+      },
+      "fury": {
+        "name": "Dual-Wield Fury",
+        "basis": "The standard 19/32/0 Bloodthirst build.",
+        "diverges": [
+          "Improved Shouts is filler to reach Flurry's tier; vanilla reached it through Improved Battle Shout, which is not in this tree."
+        ],
+        "points": {
+          "Arms": {
+            "Improved Heroic Strike": 3, "Tactical Mastery": 5, "Improved Rend": 2,
+            "Improved Thunder Clap": 1, "Improved Overpower": 2, "Deep Wounds": 3,
+            "Master Strike": 1, "Impale": 2
+          },
+          "Fury": {
+            "Cruelty": 5, "Dual Wield Specialization": 5, "Unbridled Wrath": 5,
+            "Improved Shouts": 5, "Enrage": 5, "Death Wish": 1, "Flurry": 5, "Bloodthirst": 1
+          }
+        }
+      },
+      "protection": {
+        "name": "Shield Slam Protection",
+        "basis": "The 20/0/31 main-tank build.",
+        "diverges": [
+          "Defensive Tactics is OctoWoW-only and is taken partly because it is the cheapest route to Concussion Blow's tier.",
+          "Improved Shield Slam did not exist in vanilla; it follows Shield Slam directly."
+        ],
+        "points": {
+          "Arms": {
+            "Improved Heroic Strike": 3, "Tactical Mastery": 5, "Improved Rend": 2,
+            "Deflection": 5, "Improved Overpower": 2, "Deep Wounds": 3
+          },
+          "Protection": {
+            "Improved Bloodrage": 2, "Shield Specialization": 5, "Anticipation": 3,
+            "Toughness": 5, "Last Stand": 1, "Improved Revenge": 3, "Defiance": 5,
+            "Shield Slam": 1, "Improved Shield Slam": 2, "Defensive Tactics": 3,
+            "Concussion Blow": 1
+          }
+        }
+      }
+    },
+
+    "paladin": {
+      "holy": {
+        "name": "Holy Shock Healer",
+        "basis": "The classic 31/0/20 Illumination healer.",
+        "diverges": [
+          "Ironclad takes a single point purely to reach Daybreak's tier - there is no vanilla talent in that position.",
+          "Daybreak itself is OctoWoW-only."
+        ],
+        "points": {
+          "Holy": {
+            "Divine Intellect": 5, "Improved Seal of Righteousness": 3, "Spiritual Focus": 2,
+            "Healing Light": 3, "Improved Lay on Hands": 2, "Illumination": 5,
+            "Holy Shock": 1, "Divine Favor": 5, "Holy Power": 3, "Ironclad": 1, "Daybreak": 1
+          },
+          "Retribution": {
+            "Improved Blessings": 5, "Benediction": 5, "Improved Judgement": 2,
+            "Conviction": 5, "Blessing of Kings": 1, "Pursuit of Justice": 2
+          }
+        }
+      },
+      "protection": {
+        "name": "Holy Shield Protection",
+        "basis": "The 0/31/20 Reckoning tank build.",
+        "diverges": [
+          "Righteous Strikes and Bulwark of the Righteous are OctoWoW-only; the two points in Righteous Strikes exist to open Bulwark's tier.",
+          "Shield Specialization here requires five points in Redoubt first, which vanilla did not demand."
+        ],
+        "points": {
+          "Holy": {
+            "Divine Strength": 5, "Improved Seal of Righteousness": 5, "Sanctity Aura": 1,
+            "Unyielding Faith": 2, "Healing Light": 2, "Ironclad": 2,
+            "Improved Concentration Aura": 3
+          },
+          "Protection": {
+            "Improved Devotion Aura": 5, "Redoubt": 5, "Toughness": 5,
+            "Shield Specialization": 3, "Blessing of Sanctuary": 1, "Anticipation": 3,
+            "Holy Shield": 1, "Reckoning": 5, "Righteous Strikes": 2,
+            "Bulwark of the Righteous": 1
+          }
+        }
+      },
+      "retribution": {
+        "name": "Seal of Command Retribution",
+        "basis": "The familiar deep-Retribution build built around Vengeance and Seal of Command.",
+        "diverges": [
+          "Vengeful Strikes has no vanilla counterpart and is the single biggest reason this build goes 36 points deep rather than stopping at 31.",
+          "Precision in the Protection tree grants hit, but is not taken here - the points buy more from Conviction and Vengeance."
+        ],
+        "points": {
+          "Holy": {
+            "Divine Strength": 5, "Improved Seal of Righteousness": 5, "Holy Judgement": 3,
+            "Spiritual Focus": 1, "Sanctity Aura": 1
+          },
+          "Retribution": {
+            "Improved Blessings": 5, "Benediction": 5, "Improved Seal of the Crusader": 3,
+            "Improved Judgement": 2, "Conviction": 5, "Blessing of Kings": 1,
+            "Two-Handed Weapon Specialization": 3, "Vengeance": 5, "Seal of Command": 1,
+            "Vengeful Strikes": 5, "Repentance": 1
+          }
+        }
+      }
+    },
+
+    "hunter": {
+      "beastmastery": {
+        "name": "Beast Mastery",
+        "basis": "The classic deep-BM build ending in Bestial Wrath and Frenzy.",
+        "diverges": [
+          "Kill Command is OctoWoW-only and sits behind two points in Spirit Bond.",
+          "The eighteen points go to Survival rather than Marksmanship, because Surefooted's 3% hit is worth more here than a partial Mortal Shots."
+        ],
+        "points": {
+          "Beast Mastery": {
+            "Swift Aspects": 3, "Endurance Training": 5, "Improved Primal Aspects": 2,
+            "Unleashed Fury": 5, "Ferocity": 5, "Scent of Blood": 3, "Bestial Wrath": 1,
+            "Intimidation": 1, "Spirit Bond": 2, "Frenzy": 5, "Kill Command": 1
+          },
+          "Survival": {
+            "Improved Slaying": 3, "Resourcefulness": 5, "Savage Strikes": 2,
+            "Survivalist": 5, "Surefooted": 3
+          }
+        }
+      },
+      "marksmanship": {
+        "name": "Marksmanship",
+        "basis": "The standard Aimed Shot / Mortal Shots ranged build.",
+        "diverges": [
+          "Experimental Ammunition, Piercing Shots and Lock and Load are all OctoWoW additions; Lock and Load is what makes going 33 deep worthwhile.",
+          "Surefooted is taken in Survival for its 3% hit, which counts against the gear hit budget the planner solves for."
+        ],
+        "points": {
+          "Marksmanship": {
+            "Efficiency": 5, "Lethal Shots": 5, "Aimed Shot": 1, "Hawk Eye": 2,
+            "Swiftshot": 3, "Mortal Shots": 5, "Experimental Ammunition": 1,
+            "Piercing Shots": 2, "Barrage": 3, "Ranged Weapon Specialization": 5,
+            "Lock and Load": 1
+          },
+          "Survival": {
+            "Improved Slaying": 3, "Resourcefulness": 5, "Savage Strikes": 2,
+            "Survivalist": 5, "Surefooted": 3
+          }
+        }
+      },
+      "survival": {
+        "name": "Survival",
+        "basis": "Vanilla Survival was a support tree; this leans on OctoWoW's expanded version of it.",
+        "diverges": [
+          "Carve, Lacerate, Untamed Trapper and Killer Instinct have no vanilla equivalents - most of this build is OctoWoW-specific and is the least settled of the three hunter builds.",
+          "Mortal Shots is left at three of five because the points cannot reach further without giving up Untamed Trapper."
+        ],
+        "points": {
+          "Marksmanship": {
+            "Efficiency": 5, "Lethal Shots": 5, "Aimed Shot": 1, "Hawk Eye": 2,
+            "Swiftshot": 3, "Mortal Shots": 3
+          },
+          "Survival": {
+            "Improved Slaying": 3, "Resourcefulness": 5, "Swift Reflexes": 1,
+            "Savage Strikes": 2, "Survivalist": 5, "Carve": 1, "Surefooted": 3,
+            "Killer Instinct": 3, "Trap Mastery": 3, "Lightning Reflexes": 5,
+            "Untamed Trapper": 1
+          }
+        }
+      }
+    },
+
+    "rogue": {
+      "combat": {
+        "name": "Combat Swords",
+        "basis": "The 20/31/0 Adrenaline Rush build every vanilla rogue guide lands on.",
+        "diverges": [
+          "Weapon Expertise replaces vanilla's Sword/Mace/Fist specialisations, so weapon choice no longer changes the build.",
+          "Surprise Attack, Blade Rush and Hack and Slash are OctoWoW-only; Blade Rush follows Surprise Attack.",
+          "Deflection is taken as the route to the fourth tier, not for the parry."
+        ],
+        "points": {
+          "Assassination": {
+            "Malice": 5, "Remorseless Attacks": 2, "Ruthlessness": 3, "Lethality": 5,
+            "Improved Poisons": 3, "Vile Poisons": 2
+          },
+          "Combat": {
+            "Lightning Reflexes": 5, "Precision": 5, "Deflection": 5,
+            "Dual Wield Specialization": 5, "Surprise Attack": 1, "Weapon Expertise": 2,
+            "Hack and Slash": 2, "Aggression": 3, "Blade Rush": 2, "Adrenaline Rush": 1
+          }
+        }
+      },
+      "assassination": {
+        "name": "Assassination Daggers",
+        "basis": "The Seal Fate / Cold Blood dagger build.",
+        "diverges": [
+          "Envenom and Noxious Assault are OctoWoW-only; Noxious Assault sits behind Envenom.",
+          "Precision in Combat still supplies the 5% hit this build depends on, exactly as in vanilla."
+        ],
+        "points": {
+          "Assassination": {
+            "Malice": 5, "Remorseless Attacks": 2, "Ruthlessness": 3, "Murder": 2,
+            "Lethality": 5, "Relentless Strikes": 1, "Improved Poisons": 3,
+            "Vile Poisons": 3, "Cold Blood": 1, "Envenom": 1, "Seal Fate": 5,
+            "Noxious Assault": 1
+          },
+          "Combat": {
+            "Lightning Reflexes": 5, "Precision": 5, "Deflection": 5,
+            "Dual Wield Specialization": 4
+          }
+        }
+      },
+      "subtlety": {
+        "name": "Hemorrhage Subtlety",
+        "basis": "The Hemorrhage build, which in vanilla was a PvP staple rather than a raid spec.",
+        "diverges": [
+          "Tricks of the Trade, Mark for Death and Shadow of Death are OctoWoW additions and carry most of this build's value.",
+          "Blackjack and Improved Ambush take points purely to reach the fifth tier."
+        ],
+        "points": {
+          "Assassination": {
+            "Malice": 5, "Remorseless Attacks": 2, "Murder": 1, "Ruthlessness": 3,
+            "Lethality": 5, "Improved Poisons": 3
+          },
+          "Subtlety": {
+            "Camouflage": 5, "Improved Expose Armor": 2, "Serrated Blades": 3,
+            "Elusiveness": 1, "Improved Ambush": 1, "Improved Ghostly Strike": 3,
+            "Hemorrhage": 1, "Cloaked in Shadows": 2, "Blackjack": 2, "Dirty Deeds": 2,
+            "Preparation": 1, "Shadow of Death": 1, "Bloody Mess": 2,
+            "Tricks of the Trade": 5, "Mark for Death": 1
+          }
+        }
+      }
+    },
+
+    "priest": {
+      "shadow": {
+        "name": "Shadowform",
+        "basis": "The standard deep-Shadow raiding build.",
+        "diverges": [
+          "Vampiric Touch is OctoWoW-only and follows Vampiric Embrace.",
+          "Shadow Focus is five points of spell hit against shadow targets - the planner subtracts it from the hit it goes shopping for."
+        ],
+        "points": {
+          "Discipline": {
+            "Mental Agility": 5, "Wand Specialization": 2, "Silent Resolve": 3,
+            "Blessed Concentration": 2, "Meditation": 3, "Inner Focus": 1,
+            "Improved Inner Fire": 2, "Improved Power Word: Shield": 2
+          },
+          "Shadow": {
+            "Spirit Tap": 5, "Improved Mind Blast": 5, "Shadow Focus": 5, "Mind Flay": 1,
+            "Shadow Weaving": 5, "Improved Mana Burn": 1, "Vampiric Embrace": 1,
+            "Vampiric Touch": 2, "Darkness": 5, "Shadowform": 1
+          }
+        }
+      },
+      "holy": {
+        "name": "Holy Healer",
+        "basis": "The classic Spiritual Guidance / Spiritual Healing raid healer.",
+        "diverges": [
+          "Reservoir of Light and Book of Prayer are OctoWoW-only and are passed over here in favour of the vanilla core.",
+          "Divine Fury is kept at five even for a pure healer, as it is still the cheapest route through the second tier."
+        ],
+        "points": {
+          "Discipline": {
+            "Mental Agility": 5, "Silent Resolve": 3, "Blessed Concentration": 2,
+            "Meditation": 3, "Inner Focus": 1, "Improved Power Word: Shield": 3,
+            "Improved Inner Fire": 2
+          },
+          "Holy": {
+            "Improved Renew": 3, "Holy Focus": 2, "Divinity": 5, "Divine Fury": 5,
+            "Inspiration": 3, "Improved Healing": 3, "Spiritual Guidance": 5,
+            "Spirit of Redemption": 1, "Spiritual Healing": 5
+          }
+        }
+      },
+      "discipline": {
+        "name": "Discipline",
+        "basis": "Vanilla had no raid-viable Discipline build; this is built from OctoWoW's rewritten tree.",
+        "diverges": [
+          "Force of Will, Chastise, Enlighten, Resurgent Shield and Purifying Flames are all OctoWoW-only. This build is the least traditional of the three and the most worth arguing with.",
+          "Searing Light takes three points mainly to open the fourth tier."
+        ],
+        "points": {
+          "Discipline": {
+            "Mental Agility": 5, "Silent Resolve": 5, "Blessed Concentration": 2,
+            "Meditation": 3, "Inner Focus": 1, "Improved Power Word: Shield": 3,
+            "Searing Light": 3, "Mental Strength": 3, "Enlighten": 1,
+            "Force of Will": 5, "Chastise": 1
+          },
+          "Holy": {
+            "Improved Renew": 3, "Holy Focus": 2, "Divinity": 5, "Inspiration": 3,
+            "Blessed Recovery": 3, "Improved Healing": 3
+          }
+        }
+      }
+    },
+
+    "shaman": {
+      "elemental": {
+        "name": "Elemental",
+        "basis": "The Lightning Mastery / Elemental Fury caster build.",
+        "diverges": [
+          "Elemental Devastation grants hit on this server rather than vanilla's crit-after-crit effect - three points is 3% hit, and the planner counts it.",
+          "Earthquake and Improved Molten Blast are OctoWoW-only; Earthquake is taken, Molten Blast is not."
+        ],
+        "points": {
+          "Elemental": {
+            "Convection": 5, "Concussion": 5, "Elemental Devastation": 3,
+            "Elemental Focus": 1, "Ancestral Knowledge": 3, "Call of Thunder": 5,
+            "Call of Flame": 3, "Elemental Mastery": 1, "Elemental Fury": 2,
+            "Lightning Mastery": 5, "Earthquake": 1
+          },
+          "Restoration": {
+            "Tidal Focus": 5, "Tidal Mastery": 5, "Nature's Grace": 3,
+            "Totemic Mastery": 1, "Healing Focus": 2, "Healing Way": 1
+          }
+        }
+      },
+      "enhancement": {
+        "name": "Enhancement",
+        "basis": "The Stormstrike / Flurry melee build.",
+        "diverges": [
+          "Stormstrike is a single point in the fifth tier here rather than a 30-point capstone, which frees the deep points for Element's Grace and Bloodlust.",
+          "Lightning Strike needs three points in Stable Shields first, so Stable Shields is taken despite doing nothing for damage.",
+          "Elemental Devastation is taken for its 3% hit, not for damage."
+        ],
+        "points": {
+          "Elemental": {
+            "Convection": 5, "Concussion": 5, "Elemental Devastation": 3,
+            "Ancestral Knowledge": 3, "Elemental Focus": 1, "Call of Thunder": 1
+          },
+          "Enhancement": {
+            "Ancestral Knowledge": 5, "Thundering Strikes": 5, "Stable Shields": 3,
+            "Improved Ghost Wolf": 2, "Totemic Alignment": 2, "Lightning Strike": 1,
+            "Flurry": 5, "Elemental Weapons": 3, "Stormstrike": 1,
+            "Element's Grace": 5, "Bloodlust": 1
+          }
+        }
+      },
+      "tank": {
+        "name": "Shield Tank",
+        "basis": "Not adapted from vanilla - vanilla had no shaman tank. This is a real 12/39/0 build taken from a geared OctoWoW shaman tank and verified against the live talent calculator.",
+        "diverges": [
+          "The whole spec is OctoWoW-only. Ancestral Guardian (+15% item armour, +6% dodge) and Spirit Armor (+30% shield armour) are the talents that make it work, and neither exists in vanilla.",
+          "Elemental Warding and Elemental Devastation split the Elemental points: mitigation plus the 3% hit that keeps threat abilities landing."
+        ],
+        "points": {
+          "Elemental": {
+            "Concussion": 5, "Elemental Warding": 3, "Elemental Devastation": 3,
+            "Elemental Focus": 1
+          },
+          "Enhancement": {
+            "Ancestral Knowledge": 5, "Shield Specialization": 5, "Totemic Alignment": 2,
+            "Thundering Strikes": 5, "Stable Shields": 3, "Lightning Strike": 1,
+            "Ancestral Guardian": 3, "Flurry": 5, "Spirit Armor": 2,
+            "Elemental Weapons": 3, "Stormstrike": 1, "Element's Grace": 3,
+            "Bloodlust": 1
+          }
+        }
+      },
+      "restoration": {
+        "name": "Restoration",
+        "basis": "The Chain Heal build, tracking vanilla's Restoration core.",
+        "diverges": [
+          "Spirit Link and Improved Water Shield are OctoWoW-only; Spirit Link is the capstone this build spends 36 points to reach.",
+          "No hit is taken anywhere - a healer never needs it, and the planner does not budget for any."
+        ],
+        "points": {
+          "Elemental": {
+            "Convection": 5, "Concussion": 3, "Elemental Warding": 3,
+            "Ancestral Knowledge": 3, "Elemental Focus": 1
+          },
+          "Restoration": {
+            "Improved Healing Wave": 5, "Tidal Focus": 5, "Tidal Mastery": 5,
+            "Nature's Grace": 3, "Totemic Mastery": 1, "Healing Way": 3,
+            "Restorative Totems": 5, "Tidal Surge": 2, "Ancestral Swiftness": 1,
+            "Improved Chain Heal": 5, "Spirit Link": 1
+          }
+        }
+      }
+    },
+
+    "mage": {
+      "fire": {
+        "name": "Fire",
+        "basis": "The Fire Power / Combustion build.",
+        "diverges": [
+          "Hot Streak is OctoWoW-only and follows Pyroblast.",
+          "Arcane Focus is deliberately skipped: its hit only applies to Arcane spells, so it does nothing for a Fire mage. The planner budgets full gear hit accordingly."
+        ],
+        "points": {
+          "Arcane": {
+            "Arcane Subtlety": 2, "Magic Absorption": 3, "Arcane Concentration": 5,
+            "Wand Specialization": 2, "Arcane Impact": 3, "Magic Attunement": 1
+          },
+          "Fire": {
+            "Improved Fireball": 5, "Impact": 5, "Ignite": 5, "Pyroblast": 1,
+            "Burning Soul": 2, "Fire Vulnerability": 3, "Master of Elements": 3,
+            "Critical Mass": 3, "Hot Streak": 2, "Fire Power": 5, "Combustion": 1
+          }
+        }
+      },
+      "frost": {
+        "name": "Frost",
+        "basis": "The Shatter / Winter's Chill build.",
+        "diverges": [
+          "Icicles and Flash Freeze are OctoWoW-only; neither makes the cut here.",
+          "Elemental Precision is three points of Fire and Frost hit, which the planner subtracts from the gear hit it looks for."
+        ],
+        "points": {
+          "Arcane": {
+            "Arcane Subtlety": 2, "Magic Absorption": 3, "Arcane Concentration": 5,
+            "Wand Specialization": 2, "Arcane Impact": 3, "Magic Attunement": 1,
+            "Arcane Rupture": 1
+          },
+          "Frost": {
+            "Improved Frostbolt": 5, "Elemental Precision": 3, "Piercing Ice": 3,
+            "Frostbite": 3, "Improved Frost Nova": 2, "Ice Shards": 5, "Cold Snap": 1,
+            "Shatter": 5, "Ice Block": 1, "Winter's Chill": 5, "Ice Barrier": 1
+          }
+        }
+      },
+      "arcane": {
+        "name": "Arcane",
+        "basis": "Vanilla had no deep-Arcane raid build; OctoWoW's tree supports one, so this is largely new.",
+        "diverges": [
+          "Resonance Cascade, Temporal Convergence, Accelerated Arcana and Arcane Rupture are all OctoWoW-only. This is the least traditional mage build of the three.",
+          "Arcane Focus is worth taking here and only here, because Arcane is the school it applies to."
+        ],
+        "points": {
+          "Arcane": {
+            "Arcane Subtlety": 2, "Improved Arcane Missiles": 5, "Arcane Focus": 5,
+            "Arcane Concentration": 5, "Arcane Impact": 3, "Arcane Rupture": 1,
+            "Magic Attunement": 1, "Temporal Convergence": 3, "Arcane Meditation": 3,
+            "Arcane Instability": 3, "Presence of Mind": 1, "Arcane Potency": 2,
+            "Arcane Power": 1
+          },
+          "Frost": {
+            "Improved Frostbolt": 5, "Elemental Precision": 3, "Piercing Ice": 3,
+            "Ice Shards": 5
+          }
+        }
+      }
+    },
+
+    "warlock": {
+      "destruction": {
+        "name": "Destruction",
+        "basis": "The Ruin / Emberstorm build.",
+        "diverges": [
+          "Conflagrate requires five points in Improved Immolate here, which shapes the deep end of the tree.",
+          "Suppression is taken in Affliction for its 2% spell hit per rank - the planner counts it against the hit budget."
+        ],
+        "points": {
+          "Affliction": {
+            "Suppression": 5, "Improved Corruption": 5, "Improved Life Tap": 2,
+            "Improved Curse of Agony": 3, "Fel Concentration": 2
+          },
+          "Destruction": {
+            "Cataclysm": 5, "Bane": 5, "Devastation": 5, "Intensity": 2,
+            "Shadowburn": 1, "Destructive Reach": 2, "Pyroclasm": 2,
+            "Improved Immolate": 5, "Ruin": 1, "Emberstorm": 5, "Conflagrate": 1
+          }
+        }
+      },
+      "affliction": {
+        "name": "Affliction",
+        "basis": "The Shadow Mastery drain build.",
+        "diverges": [
+          "Dark Harvest and Rapid Deterioration are OctoWoW-only; Dark Harvest is what justifies going 36 deep.",
+          "Suppression's five points are 10% spell hit against shadow targets, which is most of a caster's hit requirement on its own."
+        ],
+        "points": {
+          "Affliction": {
+            "Suppression": 5, "Improved Corruption": 5, "Improved Life Tap": 2,
+            "Improved Drains": 2, "Improved Curse of Agony": 3, "Fel Concentration": 2,
+            "Nightfall": 2, "Grim Reach": 2, "Soul Siphon": 3, "Siphon Life": 1,
+            "Rapid Deterioration": 2, "Malediction": 1, "Shadow Mastery": 5,
+            "Dark Harvest": 1
+          },
+          "Destruction": {
+            "Cataclysm": 5, "Bane": 5, "Devastation": 5
+          }
+        }
+      },
+      "demonology": {
+        "name": "Demonology",
+        "basis": "The Soul Link build.",
+        "diverges": [
+          "Power Overwhelming, Unleashed Potential and Nether Studies are OctoWoW-only.",
+          "Demonic Precision is skipped on purpose: it grants the pet hit, not yours, so it does nothing for the gear budget."
+        ],
+        "points": {
+          "Demonology": {
+            "Demonic Embrace": 5, "Soul Entrapment": 3, "Fel Intellect": 3,
+            "Demonic Aegis": 3, "Fel Stamina": 5, "Shadow Vulnerability": 1,
+            "Demonic Sacrifice": 1, "Unholy Power": 3, "Master Summoner": 2,
+            "Power Overwhelming": 1, "Master Demonologist": 5, "Soul Link": 1
+          },
+          "Destruction": {
+            "Cataclysm": 5, "Bane": 5, "Devastation": 5, "Intensity": 2, "Shadowburn": 1
+          }
+        }
+      }
+    },
+
+    "druid": {
+      "balance": {
+        "name": "Moonkin Balance",
+        "basis": "The Moonkin Form / Nature's Grace caster build.",
+        "diverges": [
+          "Eclipse, Balance of All Things and Gale Winds are OctoWoW-only and are what take this build to 36 points.",
+          "Improved Nature's Grasp requires a point in Nature's Grasp first, exactly as in vanilla."
+        ],
+        "points": {
+          "Balance": {
+            "Improved Wrath": 5, "Nature's Grasp": 1, "Natural Weapons": 3,
+            "Improved Moonfire": 2, "Moonfury": 3, "Omen of Clarity": 1,
+            "Nature's Reach": 2, "Vengeance": 5, "Moonglow": 3, "Moonkin Form": 1,
+            "Nature's Grace": 1, "Improved Starfire": 3, "Balance of All Things": 3,
+            "Gale Winds": 2, "Eclipse": 1
+          },
+          "Restoration": {
+            "Improved Mark of the Wild": 5, "Furor": 5, "Nature's Focus": 5
+          }
+        }
+      },
+      "feral": {
+        "name": "Feral Cat",
+        "basis": "The Heart of the Wild / Leader of the Pack cat build.",
+        "diverges": [
+          "Carnage, Ancient Brutality, Open Wounds and Berserk are OctoWoW-only.",
+          "Genesis in Restoration grants 1% hit per rank, so three points there is 3% off what the gear has to find - the same role Precision plays for a rogue."
+        ],
+        "points": {
+          "Feral Combat": {
+            "Ferocity": 5, "Feral Aggression": 2, "Open Wounds": 3, "Feral Swiftness": 2,
+            "Sharpened Claws": 3, "Primal Fury": 2, "Predatory Strikes": 3,
+            "Blood Frenzy": 2, "Improved Shred": 2, "Ancient Brutality": 2, "Berserk": 1,
+            "Heart of the Wild": 5, "Carnage": 2, "Leader of the Pack": 1
+          },
+          "Restoration": {
+            "Furor": 5, "Improved Mark of the Wild": 5, "Genesis": 3, "Reflection": 3
+          }
+        }
+      },
+      "guardian": {
+        "name": "Guardian Bear",
+        "basis": "The bear tank build, tracking vanilla's Feral core with more depth.",
+        "diverges": [
+          "Thick Hide and Feral Instinct carry more weight here than in vanilla because OctoWoW's bear scales from item armour.",
+          "Genesis supplies 3% hit, which matters for holding threat rather than for damage."
+        ],
+        "points": {
+          "Feral Combat": {
+            "Ferocity": 5, "Feral Aggression": 2, "Thick Hide": 3, "Feral Instinct": 3,
+            "Sharpened Claws": 3, "Primal Fury": 2, "Feral Swiftness": 2,
+            "Predatory Strikes": 3, "Blood Frenzy": 2, "Ancient Brutality": 2,
+            "Berserk": 1, "Heart of the Wild": 5, "Leader of the Pack": 1
+          },
+          "Restoration": {
+            "Furor": 5, "Improved Mark of the Wild": 5, "Genesis": 3, "Reflection": 3,
+            "Subtlety": 1
+          }
+        }
+      },
+      "restoration": {
+        "name": "Restoration",
+        "basis": "The Gift of Nature / Improved Regrowth healer.",
+        "diverges": [
+          "Tree of Life Form and Aessina's Bloom are OctoWoW-only; Tree of Life is the capstone this build reaches for.",
+          "Furor is kept even for a pure healer, as it is the cheapest way through the first tier."
+        ],
+        "points": {
+          "Balance": {
+            "Nature's Grasp": 1, "Improved Nature's Grasp": 4, "Sylvan Blessing": 2,
+            "Natural Shapeshifter": 3, "Guidance of the Dream": 3, "Nature's Reach": 2
+          },
+          "Restoration": {
+            "Improved Mark of the Wild": 5, "Furor": 5, "Nature's Focus": 5,
+            "Swiftmend": 1, "Genesis": 3, "Gift of Nature": 5, "Tranquil Spirit": 5,
+            "Nature's Swiftness": 1, "Improved Regrowth": 5, "Tree of Life Form": 1
+          }
+        }
+      }
+    }
+  }
+}
